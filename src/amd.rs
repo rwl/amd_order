@@ -3,9 +3,9 @@ pub const DEBUG_LEVEL: i32 = 0;
 
 pub struct Control {
     /// "dense" if degree > dense * sqrt(n)
-    dense: f64,
+    pub dense: f64,
     /// Do aggressive absorption.
-    aggressive: bool,
+    pub aggressive: bool,
 }
 
 pub fn default_control_settings() -> Control {
@@ -33,10 +33,10 @@ pub struct Info {
     pub n_dense: i32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Status {
     OK,
-    // OutOfMemory,
+    OutOfMemory,
     /// Input arguments are not valid.
     Invalid,
     /// Input matrix is OK for order, but columns were not sorted, and/or

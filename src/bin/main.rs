@@ -12,9 +12,9 @@ fn main() {
         2, 3, // 4th row
         1, 4, // 5th row
     ];
-    let control = default_control_settings();
+    let control = amd_order::amd::default_control_settings();
 
-    let (permutation, info) = order(n, a_p, a_i, control);
+    let (permutation, info) = order(n, &a_p, &a_i, control);
 
     println!("P = {:?}", permutation);
     println!("Info = {:?}", info);

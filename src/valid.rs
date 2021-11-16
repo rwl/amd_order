@@ -1,6 +1,6 @@
 use crate::amd::*;
 
-pub fn valid(n_row: i32, n_col: i32, a_p: Vec<i32>, a_i: Vec<i32>) -> Status {
+pub fn valid(n_row: i32, n_col: i32, a_p: &[i32], a_i: &[i32]) -> Status {
     if n_row < 0 || n_col < 0 {
         return Status::Invalid;
     }
