@@ -38,11 +38,11 @@ pub fn aat(
     let mut nzboth: i32 = 0;
     let nz: i32 = a_p[n as usize];
 
-    for k in 0..n as usize {
+    for k in 0..n {
         // let p: i32;
         // let mut pj: i32;
-        let p1 = a_p[k];
-        let p2 = a_p[k + 1];
+        let p1 = a_p[k as usize];
+        let p2 = a_p[k as usize + 1];
         if DEBUG_LEVEL >= 2 {
             print!("\nAAT Column: {} p1: {} p2: {}\n", k, p1, p2)
         }
@@ -51,12 +51,12 @@ pub fn aat(
         let mut p = p1;
         while p < p2 {
             // Scan the upper triangular part of A.
-            let j = a_i[p as usize] as usize;
+            let j = a_i[p as usize];
             if j < k {
                 // Entry A(j,k) is in the strictly upper triangular part,
                 // add both A(j,k) and A(k,j) to the matrix A+A'.
-                len[j] += 1;
-                len[k] += 1;
+                len[j as usize] += 1;
+                len[k as usize] += 1;
                 if DEBUG_LEVEL >= 3 {
                     print!("    upper ({},{}) ({},{})\n", j, k, k, j)
                 }
@@ -75,19 +75,21 @@ pub fn aat(
             // Scan lower triangular part of A, in column j until reaching
             // row k. Start where last scan left off.
             if DEBUG_LEVEL != 0 {
-                debug_assert!(t_p[j] != EMPTY);
-                debug_assert!(a_p[j] <= t_p[j] && t_p[j] <= a_p[j + 1]);
+                debug_assert!(t_p[j as usize] != EMPTY);
+                debug_assert!(
+                    a_p[j as usize] <= t_p[j as usize] && t_p[j as usize] <= a_p[j as usize + 1]
+                );
             }
 
-            let pj2 = a_p[j + 1];
-            let mut pj = t_p[j];
+            let pj2 = a_p[j as usize + 1];
+            let mut pj = t_p[j as usize];
             while pj < pj2 {
-                let i = a_i[pj as usize] as usize;
+                let i = a_i[pj as usize];
                 if i < k {
                     // A(i,j) is only in the lower part, not in upper.
                     // add both A(i,j) and A(j,i) to the matrix A+A'.
-                    len[i] += 1;
-                    len[j] += 1;
+                    len[i as usize] += 1;
+                    len[j as usize] += 1;
                     if DEBUG_LEVEL >= 3 {
                         print!("    lower ({},{}) ({},{})\n", i, j, j, i);
                     }
@@ -103,20 +105,20 @@ pub fn aat(
                     break;
                 }
             }
-            t_p[j] = pj;
+            t_p[j as usize] = pj;
         }
         // Tp[k] points to the entry just below the diagonal in column k.
-        t_p[k] = p;
+        t_p[k as usize] = p;
     }
 
     // Clean up, for remaining mismatched entries.
-    for j in 0..n as usize {
-        for pj in t_p[j]..a_p[j + 1] {
-            let i = a_i[pj as usize] as usize;
+    for j in 0..n {
+        for pj in t_p[j as usize]..a_p[j as usize + 1] {
+            let i = a_i[pj as usize];
             // A(i,j) is only in the lower part, not in upper.
             // add both A(i,j) and A(j,i) to the matrix A+A'.
-            len[i] += 1;
-            len[j] += 1;
+            len[i as usize] += 1;
+            len[j as usize] += 1;
             if DEBUG_LEVEL >= 3 {
                 print!("    lower cleanup ({},{}) ({},{})\n", i, j, j, i)
             }

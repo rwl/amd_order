@@ -20,18 +20,18 @@ pub fn preprocess(
 
     // Count the entries in each row of A (excluding duplicates).
 
-    for i in 0..n as usize {
-        w[i] = 0; // # of nonzeros in row i (excl duplicates)
-        flag[i] = EMPTY; // flag[i] = j if i appears in column j.
+    for i in 0..n {
+        w[i as usize] = 0; // # of nonzeros in row i (excl duplicates)
+        flag[i as usize] = EMPTY; // flag[i] = j if i appears in column j.
     }
     for j in 0..n {
         let p2 = a_p[j as usize + 1];
         for p in a_p[j as usize]..p2 {
-            let i = a_i[p as usize] as usize;
-            if flag[i] != j {
+            let i = a_i[p as usize];
+            if flag[i as usize] != j {
                 // Row index i has not yet appeared in column j.
-                w[i] += 1; // One more entry in row i.
-                flag[i] = j; // Flag row index i as appearing in col j.
+                w[i as usize] += 1; // One more entry in row i.
+                flag[i as usize] = j; // Flag row index i as appearing in col j.
             }
         }
     }
@@ -43,12 +43,12 @@ pub fn preprocess(
     let mut r_i: Vec<i32> = vec![0; max(nz as usize, 1)];
 
     r_p[0] = 0;
-    for i in 0..n as usize {
-        r_p[i + 1] = r_p[i] + w[i];
+    for i in 0..n {
+        r_p[i as usize + 1] = r_p[i as usize] + w[i as usize];
     }
-    for i in 0..n as usize {
-        w[i] = r_p[i];
-        flag[i] = EMPTY
+    for i in 0..n {
+        w[i as usize] = r_p[i as usize];
+        flag[i as usize] = EMPTY
     }
 
     // Construct the row form matrix R.
@@ -57,20 +57,20 @@ pub fn preprocess(
     for j in 0..n {
         let p2 = a_p[j as usize + 1];
         for p in a_p[j as usize]..p2 {
-            let i = a_i[p as usize] as usize;
-            if flag[i] != j {
+            let i = a_i[p as usize];
+            if flag[i as usize] != j {
                 // Row index i has not yet appeared in column j.
-                r_i[w[i] as usize] = j; // Put col j in row i.
-                w[i] += 1;
-                flag[i] = j; // Flag row index i as appearing in col j.
+                r_i[w[i as usize] as usize] = j; // Put col j in row i.
+                w[i as usize] += 1;
+                flag[i as usize] = j; // Flag row index i as appearing in col j.
             }
         }
     }
 
     if DEBUG_LEVEL != 0 {
         debug_assert!(valid(n, n, &r_p, &r_i) == Status::OK);
-        for j in 0..n as usize {
-            debug_assert!(w[j] == r_p[j + 1])
+        for j in 0..n {
+            debug_assert!(w[j as usize] == r_p[j as usize + 1])
         }
     }
 

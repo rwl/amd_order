@@ -14,11 +14,11 @@ pub fn info(info: Info) {
     print!("    status:                                             ");
     if info.status == Status::OK {
         println!("OK");
-    } else if info.status == Status::OUT_OF_MEMORY {
+    } else if info.status == Status::OutOfMemory {
         println!("out of memory");
-    } else if info.status == Status::INVALID {
+    } else if info.status == Status::Invalid {
         println!("invalid matrix");
-    } else if info.status == Status::OK_BUT_JUMBLED {
+    } else if info.status == Status::OkButJumbled {
         println!("OK, but jumbled");
     } else {
         println!("unknown");

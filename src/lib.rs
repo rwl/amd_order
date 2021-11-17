@@ -6,7 +6,7 @@ pub mod amd;
 mod amd_1;
 mod amd_2;
 mod dump;
-mod info;
+pub mod info;
 mod internal;
 mod post_tree;
 mod postorder;
@@ -30,6 +30,12 @@ pub fn order(n: i32, a_p: &[i32], a_i: &[i32], control: Control) -> (Vec<i32>, I
         nz_diag: 0,
         nz_a_plus_at: 0,
         n_dense: 0,
+        n_cmp_a: 0,
+        lnz: 0,
+        n_div: 0,
+        n_mult_subs_ldl: 0,
+        n_mult_subs_lu: 0,
+        d_max: 0,
     };
 
     if n < 0 {
@@ -103,7 +109,7 @@ pub fn order(n: i32, a_p: &[i32], a_i: &[i32], control: Control) -> (Vec<i32>, I
         }
     };
     // size-n elbow room, 6 size-n work
-    for i in 0..7 {
+    for _ in 0..7 {
         slen = match slen.checked_add(n) {
             Some(v) => v,
             None => {
@@ -126,12 +132,12 @@ pub fn order(n: i32, a_p: &[i32], a_i: &[i32], control: Control) -> (Vec<i32>, I
         print!("slen {}\n", slen)
     }
 
-    let mut s: Vec<i32> = vec![0, slen];
+    let mut s: Vec<i32> = vec![0; slen as usize];
 
     // Order the matrix.
 
     amd_1(
-        n, &c_p, &c_i, &mut p, &mut p_inv, &len, slen, &mut s, control, &mut info,
+        n, &c_p, &c_i, &mut p, &mut p_inv, &mut len, slen, &mut s, control, &mut info,
     );
 
     return (p, info);
