@@ -5,7 +5,11 @@ mod aat;
 pub mod amd;
 mod amd_1;
 mod amd_2;
+mod dump;
+mod info;
 mod internal;
+mod post_tree;
+mod postorder;
 mod preprocess;
 mod valid;
 

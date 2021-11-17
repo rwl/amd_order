@@ -7,3 +7,8 @@ pub const EMPTY: i32 = -1;
 pub fn flip(i: i32) -> i32 {
     -i - 2
 }
+
+// Logical expression of p implies q:
+pub fn implies(p: bool, q: bool) -> bool {
+    !p || q
+}

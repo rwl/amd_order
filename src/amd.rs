@@ -31,6 +31,18 @@ pub struct Info {
     pub nz_a_plus_at: i32,
     /// Number of "dense" rows/columns in A.
     pub n_dense: i32,
+    /// Number of garbage collections in AMD.
+    pub n_cmp_a: i32,
+    /// Approx. nz in L, excluding the diagonal.
+    pub lnz: i32,
+    /// Number of fl. point divides for LU and LDL'.
+    pub n_div: i32,
+    /// Number of fl. point (*,-) pairs for LDL'.
+    pub n_mult_subs_ldl: i32,
+    /// Number of fl. point (*,-) pairs for LU.
+    pub n_mult_subs_lu: i32,
+    /// Max nz. in any column of L, incl. diagonal.
+    pub d_max: i32,
 }
 
 #[derive(Debug, PartialEq)]
