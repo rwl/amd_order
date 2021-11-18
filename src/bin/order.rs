@@ -8,7 +8,7 @@ fn main() {
     // The symmetric can_24 Harwell/Boeing matrix, including upper and lower
     // triangular parts, and the diagonal entries.  Note that this matrix is
     // 0-based, with row and column indices in the range 0 to n-1.
-    let n: i32 = 24;
+    let n: usize = 24;
 
     let a_p = vec![
         0, 9, 15, 21, 27, 33, 39, 48, 57, 61, 70, 76, 82, 88, 94, 100, 106, 110, 119, 128, 137,
@@ -51,7 +51,7 @@ fn main() {
     amd_order::control::control(&control);
 
     // Print the input matrix.
-    let nz = a_p[n as usize];
+    let nz = a_p[n];
     print!(
         "\nInput matrix:  {}-by-{}, with {} entries.
     Note that for a symmetric matrix such as this one, only the
@@ -61,7 +61,7 @@ fn main() {
         n, n, nz
     );
 
-    for j in 0..n as usize {
+    for j in 0..n {
         print!(
             "\nColumn: {}, number of entries: {}, with row indices in
  Ai [{} ... {}]:
@@ -81,8 +81,8 @@ fn main() {
     // Print a character plot of the input matrix. This is only reasonable
     // because the matrix is small.
     print!("\nPlot of input matrix pattern:\n");
-    for j in 0..n as usize {
-        for i in 0..n as usize {
+    for j in 0..n {
+        for i in 0..n {
             a[i][j] = "."
         }
         for pj in a_p[j]..a_p[j + 1] {
@@ -98,13 +98,13 @@ fn main() {
     for i in 0..n {
         print!("{}: ", i);
         for j in 0..n {
-            print!(" {}", a[i as usize][j as usize]);
+            print!(" {}", a[i][j]);
         }
         print!("\n");
     }
 
     // Order the matrix.
-    let (p, info) = order(n, &a_p, &a_i, control);
+    let (p, info) = order(n as i32, &a_p, &a_i, control);
     print!(
         "return value from amd_order: {:?} (should be {:?})\n",
         info.status,
@@ -123,7 +123,7 @@ fn main() {
     print!("Permutation vector:\n");
     for k in 0..n {
         // Row/column j is the kth row/column in the permuted matrix.
-        let j = p[k as usize];
+        let j = p[k];
         p_inv[j as usize] = k;
         print!(" {}", j);
     }
@@ -131,16 +131,16 @@ fn main() {
 
     print!("Inverse permutation vector:\n");
     for j in 0..n {
-        let k = p_inv[j as usize];
+        let k = p_inv[j];
         print!(" {}", k);
     }
     print!("\n\n");
 
     // Print a character plot of the permuted matrix.
     print!("\nPlot of permuted matrix pattern:\n");
-    for jnew in 0..n as usize {
+    for jnew in 0..n {
         let j = p[jnew] as usize;
-        for inew in 0..n as usize {
+        for inew in 0..n {
             a[inew][jnew] = ".";
         }
         for pj in a_p[j]..a_p[j + 1] {
@@ -157,7 +157,7 @@ fn main() {
     for i in 0..n {
         print!("{}: ", i);
         for j in 0..n {
-            print!(" {}", a[i as usize][j as usize]);
+            print!(" {}", a[i][j]);
         }
         print!("\n");
     }

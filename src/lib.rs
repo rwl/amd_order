@@ -141,5 +141,7 @@ pub fn order(n: i32, a_p: &[i32], a_i: &[i32], control: Control) -> (Vec<i32>, I
         n, &c_p, &c_i, &mut p, &mut p_inv, &mut len, slen, &mut s, control, &mut info,
     );
 
+    info.status = status;
+
     return (p, info);
 }
