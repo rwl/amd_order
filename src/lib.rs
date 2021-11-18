@@ -5,6 +5,7 @@ mod aat;
 pub mod amd;
 mod amd_1;
 mod amd_2;
+pub mod control;
 mod dump;
 pub mod info;
 mod internal;
