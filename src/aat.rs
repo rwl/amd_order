@@ -1,5 +1,6 @@
 use crate::amd::*;
 use crate::internal::EMPTY;
+use crate::internal::*;
 use crate::valid::valid;
 
 pub fn aat(
@@ -10,13 +11,11 @@ pub fn aat(
     t_p: &mut [i32],
     info: &mut Info,
 ) -> i32 {
-    if DEBUG_LEVEL != 0 {
-        //debug_init ("AMD AAT") ;
-        for k in 0..n {
-            t_p[k as usize] = EMPTY
-        }
-        debug_assert!(valid(n, n, a_p, a_i) == Status::OK)
+    #[cfg(feature = "debug1")]
+    for k in 0..n {
+        t_p[k as usize] = EMPTY
     }
+    debug_assert!(valid(n, n, a_p, a_i) == Status::OK);
 
     // Clear the info array, if it exists.
     info.n = 0;
@@ -43,9 +42,7 @@ pub fn aat(
         // let mut pj: i32;
         let p1 = a_p[k as usize];
         let p2 = a_p[k as usize + 1];
-        if DEBUG_LEVEL >= 2 {
-            print!("\nAAT Column: {} p1: {} p2: {}\n", k, p1, p2)
-        }
+        debug2_print!("\nAAT Column: {} p1: {} p2: {}\n", k, p1, p2);
 
         // Construct A+A'.
         let mut p = p1;
@@ -57,9 +54,7 @@ pub fn aat(
                 // add both A(j,k) and A(k,j) to the matrix A+A'.
                 len[j as usize] += 1;
                 len[k as usize] += 1;
-                if DEBUG_LEVEL >= 3 {
-                    print!("    upper ({},{}) ({},{})\n", j, k, k, j)
-                }
+                debug3_print!("    upper ({},{}) ({},{})\n", j, k, k, j);
                 p += 1;
             } else if j == k {
                 // Skip the diagonal.
@@ -74,12 +69,10 @@ pub fn aat(
 
             // Scan lower triangular part of A, in column j until reaching
             // row k. Start where last scan left off.
-            if DEBUG_LEVEL != 0 {
-                debug_assert!(t_p[j as usize] != EMPTY);
-                debug_assert!(
-                    a_p[j as usize] <= t_p[j as usize] && t_p[j as usize] <= a_p[j as usize + 1]
-                );
-            }
+            debug_assert!(t_p[j as usize] != EMPTY);
+            debug_assert!(
+                a_p[j as usize] <= t_p[j as usize] && t_p[j as usize] <= a_p[j as usize + 1]
+            );
 
             let pj2 = a_p[j as usize + 1];
             let mut pj = t_p[j as usize];
@@ -90,9 +83,7 @@ pub fn aat(
                     // add both A(i,j) and A(j,i) to the matrix A+A'.
                     len[i as usize] += 1;
                     len[j as usize] += 1;
-                    if DEBUG_LEVEL >= 3 {
-                        print!("    lower ({},{}) ({},{})\n", i, j, j, i);
-                    }
+                    debug3_print!("    lower ({},{}) ({},{})\n", i, j, j, i);
                     pj += 1;
                 } else if i == k {
                     // Entry A(k,j) in lower part and A(j,k) in upper.
@@ -119,9 +110,7 @@ pub fn aat(
             // add both A(i,j) and A(j,i) to the matrix A+A'.
             len[i as usize] += 1;
             len[j as usize] += 1;
-            if DEBUG_LEVEL >= 3 {
-                print!("    lower cleanup ({},{}) ({},{})\n", i, j, j, i)
-            }
+            debug3_print!("    lower cleanup ({},{}) ({},{})\n", i, j, j, i);
         }
     }
 
@@ -143,13 +132,14 @@ pub fn aat(
         nzaat += len[k as usize];
     }
 
-    if DEBUG_LEVEL >= 1 {
-        print!("AMD nz in A+A', excluding diagonal (nzaat) = {}\n", nzaat);
-        print!(
-            "   nzboth: {} nz: {} nzdiag: {} symmetry: {}\n",
-            nzboth, nz, nzdiag, sym
-        );
-    }
+    debug1_print!("AMD nz in A+A', excluding diagonal (nzaat) = {}\n", nzaat);
+    debug1_print!(
+        "   nzboth: {} nz: {} nzdiag: {} symmetry: {}\n",
+        nzboth,
+        nz,
+        nzdiag,
+        sym
+    );
 
     info.status = Status::OK;
     info.n = n;

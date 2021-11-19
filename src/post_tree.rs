@@ -1,6 +1,4 @@
-use crate::amd::*;
 use crate::internal::*;
-use std::fmt::Write;
 
 pub fn post_tree(
     root: i32,
@@ -33,14 +31,10 @@ pub fn post_tree(
 
     while head >= 0 {
         // Get head of stack.
-        if DEBUG_LEVEL != 0 {
-            debug_assert!(head < nn);
-        }
+        debug_assert!(head < nn);
         let i = stack[head as usize];
-        if DEBUG_LEVEL != 0 {
-            print!("head of stack {} \n", i);
-            debug_assert!(i >= 0 && i < nn);
-        }
+        debug1_print!("head of stack {} \n", i);
+        debug_assert!(i >= 0 && i < nn);
 
         if child[i as usize] != EMPTY {
             // The children of i are not yet ordered
@@ -50,32 +44,22 @@ pub fn post_tree(
             let mut f = child[i as usize];
             while f != EMPTY {
                 head += 1;
-                if DEBUG_LEVEL != 0 {
-                    assert!(head < nn);
-                    assert!(f >= 0 && f < nn);
-                }
+                debug_assert!(head < nn);
+                debug_assert!(f >= 0 && f < nn);
                 f = sibling[f as usize];
             }
             let mut h = head;
-            if DEBUG_LEVEL != 0 {
-                debug_assert!(head < nn);
-            }
+            debug_assert!(head < nn);
             let mut f = child[i as usize];
             while f != EMPTY {
-                if DEBUG_LEVEL != 0 {
-                    debug_assert!(h > 0);
-                }
+                debug_assert!(h > 0);
                 stack[h as usize] = f;
                 h -= 1;
-                if DEBUG_LEVEL != 0 {
-                    println!("push {} on stack", f);
-                    debug_assert!(f >= 0 && f < nn);
-                }
+                debug1_println!("push {} on stack", f);
+                debug_assert!(f >= 0 && f < nn);
                 f = sibling[f as usize];
             }
-            if DEBUG_LEVEL != 0 {
-                debug_assert!(stack[h as usize] == i);
-            }
+            debug_assert!(stack[h as usize] == i);
 
             // Delete child list so that i gets ordered next time we see it.
             child[i as usize] = EMPTY;
@@ -83,28 +67,25 @@ pub fn post_tree(
             // The children of i (if there were any) are already ordered
             // remove i from the stack and order it. Front i is kth front.
             head -= 1;
-            if DEBUG_LEVEL >= 1 {
-                print!("pop {} order {}\n", i, k);
-            }
+            debug1_print!("pop {} order {}\n", i, k);
             order[i as usize] = k;
             k += 1;
-            if DEBUG_LEVEL != 0 {
-                debug_assert!(k <= nn);
-            }
+            debug_assert!(k <= nn);
         }
 
-        if DEBUG_LEVEL != 0 {
-            let mut d1 = String::from("\nStack:");
+        #[cfg(feature = "debug1")]
+        {
+            debug1_print!("\nStack:");
             // for h := head; h >= 0; h-- {
             let mut h = head;
             while h >= 0 {
                 let j = stack[h as usize];
-                write!(d1, " {}", j).unwrap();
-                assert!(j >= 0 && j < nn);
+                debug1_print!(" {}", j);
+                debug_assert!(j >= 0 && j < nn);
                 h -= 1;
             }
-            print!("{}\n\n", d1);
-            assert!(head < nn);
+            debug1_print!("\n\n");
+            debug_assert!(head < nn);
         }
     }
 

@@ -1,6 +1,3 @@
-/// Default is no debug printing (0-4).
-pub const DEBUG_LEVEL: i32 = 4;
-
 pub struct Control {
     /// "dense" if degree > dense * sqrt(n)
     pub dense: f64,

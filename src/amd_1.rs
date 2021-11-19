@@ -1,6 +1,6 @@
 use crate::amd::*;
 use crate::amd_2::amd_2;
-use crate::internal::EMPTY;
+use crate::internal::*;
 use crate::valid::valid;
 
 pub fn amd_1(
@@ -55,17 +55,13 @@ pub fn amd_1(
     // least size-n elbow room is enforced.
     debug_assert!(iwlen >= pfree + n);
 
-    if DEBUG_LEVEL != 0 {
-        for p in 0..iwlen {
-            i_w[p as usize] = EMPTY;
-        }
+    #[cfg(feature = "debug1")]
+    for p in 0..iwlen {
+        i_w[p as usize] = EMPTY;
     }
 
     for k in 0..n {
-        if DEBUG_LEVEL >= 1 {
-            print!("Construct row/column k = {} of A+A'\n", k);
-        }
-        // var p, pj int
+        debug1_print!("Construct row/column k = {} of A+A'\n", k);
         let p1 = a_p[k as usize];
         let p2 = a_p[k as usize + 1];
 
@@ -74,23 +70,22 @@ pub fn amd_1(
         while p < p2 {
             // Scan the upper triangular part of A.
             let j = a_i[p as usize];
-            if DEBUG_LEVEL != 0 {
-                debug_assert!(j >= 0 && j < n);
-            }
+            debug_assert!(j >= 0 && j < n);
             if j < k {
-                if DEBUG_LEVEL != 0 {
-                    // Entry A(j,k) in the strictly upper triangular part.
-                    if j == (n - 1) {
-                        debug_assert!(s_p[j as usize] < pfree);
-                    } else {
-                        debug_assert!(s_p[j as usize] < p_e[j as usize + 1]);
-                    }
-                    if k == (n - 1) {
-                        debug_assert!(s_p[k as usize] < pfree);
-                    } else {
-                        debug_assert!(s_p[k as usize] < p_e[k as usize + 1]);
-                    }
+                // Entry A(j,k) in the strictly upper triangular part.
+                #[cfg(feature = "debug1")]
+                if j == (n - 1) {
+                    debug_assert!(s_p[j as usize] < pfree);
+                } else {
+                    debug_assert!(s_p[j as usize] < p_e[j as usize + 1]);
                 }
+                #[cfg(feature = "debug1")]
+                if k == (n - 1) {
+                    debug_assert!(s_p[k as usize] < pfree);
+                } else {
+                    debug_assert!(s_p[k as usize] < p_e[k as usize + 1]);
+                }
+
                 i_w[s_p[j as usize] as usize] = k;
                 s_p[j as usize] += 1;
 
@@ -110,32 +105,29 @@ pub fn amd_1(
 
             // Scan lower triangular part of A, in column j until reaching
             // row k. Start where last scan left off.
-            if DEBUG_LEVEL != 0 {
-                debug_assert!(
-                    a_p[j as usize] <= t_p[j as usize] && t_p[j as usize] <= a_p[j as usize + 1]
-                );
-            }
+            debug_assert!(
+                a_p[j as usize] <= t_p[j as usize] && t_p[j as usize] <= a_p[j as usize + 1]
+            );
             let mut pj = t_p[j as usize];
             let pj2 = a_p[j as usize + 1];
             while pj < pj2 {
                 let i = a_i[pj as usize];
-                if DEBUG_LEVEL != 0 {
-                    debug_assert!(i >= 0 && i < n);
-                }
+                debug_assert!(i >= 0 && i < n);
                 if i < k {
-                    if DEBUG_LEVEL != 0 {
-                        // A (i,j) is only in the lower part, not in upper.
-                        if i == n - 1 {
-                            debug_assert!(s_p[i as usize] < pfree);
-                        } else {
-                            debug_assert!(s_p[i as usize] < p_e[i as usize + 1]);
-                        }
-                        if j == n - 1 {
-                            debug_assert!(s_p[j as usize] < pfree);
-                        } else {
-                            debug_assert!(s_p[j as usize] < p_e[j as usize + 1]);
-                        }
+                    // A (i,j) is only in the lower part, not in upper.
+                    #[cfg(feature = "debug1")]
+                    if i == n - 1 {
+                        debug_assert!(s_p[i as usize] < pfree);
+                    } else {
+                        debug_assert!(s_p[i as usize] < p_e[i as usize + 1]);
                     }
+                    #[cfg(feature = "debug1")]
+                    if j == n - 1 {
+                        debug_assert!(s_p[j as usize] < pfree);
+                    } else {
+                        debug_assert!(s_p[j as usize] < p_e[j as usize + 1]);
+                    }
+
                     i_w[s_p[i as usize] as usize] = j;
                     s_p[i as usize] += 1;
 
@@ -163,19 +155,19 @@ pub fn amd_1(
         for pj in t_p[j as usize]..a_p[j as usize + 1] {
             let i = a_i[pj as usize];
 
-            if DEBUG_LEVEL != 0 {
-                debug_assert!(i >= 0 && i < n);
-                // A(i,j) is only in the lower part, not in upper.
-                if i == n - 1 {
-                    debug_assert!(s_p[i as usize] < pfree);
-                } else {
-                    debug_assert!(s_p[i as usize] < p_e[i as usize + 1]);
-                }
-                if j == n - 1 {
-                    debug_assert!(s_p[j as usize] < pfree);
-                } else {
-                    debug_assert!(s_p[j as usize] < p_e[j as usize + 1]);
-                }
+            debug_assert!(i >= 0 && i < n);
+            // A(i,j) is only in the lower part, not in upper.
+            #[cfg(feature = "debug1")]
+            if i == n - 1 {
+                debug_assert!(s_p[i as usize] < pfree);
+            } else {
+                debug_assert!(s_p[i as usize] < p_e[i as usize + 1]);
+            }
+            #[cfg(feature = "debug1")]
+            if j == n - 1 {
+                debug_assert!(s_p[j as usize] < pfree);
+            } else {
+                debug_assert!(s_p[j as usize] < p_e[j as usize + 1]);
             }
 
             i_w[s_p[i as usize] as usize] = j;
@@ -186,12 +178,11 @@ pub fn amd_1(
         }
     }
 
-    if DEBUG_LEVEL != 0 {
-        for j in 0..(n - 1) as usize {
-            debug_assert!(s_p[j] == p_e[j + 1])
-        }
-        debug_assert!(s_p[n as usize - 1] == pfree);
+    #[cfg(feature = "debug1")]
+    for j in 0..(n - 1) as usize {
+        debug_assert!(s_p[j] == p_e[j + 1])
     }
+    debug_assert!(s_p[n as usize - 1] == pfree);
 
     // Tp and Sp no longer needed.
 

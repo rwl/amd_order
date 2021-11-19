@@ -5,3 +5,9 @@ authors = ["Richard Lincoln <r.w.lincoln@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+
+[features]
+debug1 = []
+debug2 = ["debug1"]
+debug3 = ["debug2"]
+debug4 = ["debug3"]

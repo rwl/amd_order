@@ -17,6 +17,7 @@ mod valid;
 use aat::aat;
 use amd::*;
 use amd_1::amd_1;
+use internal::*;
 use preprocess::preprocess;
 use std::cmp::max;
 use valid::valid;
@@ -71,9 +72,8 @@ pub fn order(n: i32, a_p: &[i32], a_i: &[i32], control: Control) -> (Vec<i32>, I
 
     let (c_p, c_i) = if status == Status::OkButJumbled {
         // Sort the input matrix and remove duplicate entries.
-        if DEBUG_LEVEL >= 1 {
-            println!("Matrix is jumbled")
-        }
+        debug1_println!("Matrix is jumbled");
+
         // let r_p: Vec<i32> = vec![0; n as usize + 1];
         // let r_i: Vec<i32> = vec![0; max(nz as usize, 1)];
 
@@ -94,10 +94,8 @@ pub fn order(n: i32, a_p: &[i32], a_i: &[i32], control: Control) -> (Vec<i32>, I
     // Determine the symmetry and count off-diagonal nonzeros in A+A'.
 
     let nzaat = aat(n, &c_p, &c_i, &mut len, &mut p, &mut info);
-    if DEBUG_LEVEL != 0 {
-        print!("nzaat: {}\n", nzaat);
-        debug_assert!((max(nz - n, 0) <= nzaat) && (nzaat <= 2 * nz))
-    }
+    debug1_print!("nzaat: {}\n", nzaat);
+    debug_assert!((max(nz - n, 0) <= nzaat) && (nzaat <= 2 * nz));
 
     // Allocate workspace for matrix, elbow room, and 6 size-n vectors.
 
@@ -129,9 +127,7 @@ pub fn order(n: i32, a_p: &[i32], a_i: &[i32], control: Control) -> (Vec<i32>, I
         info.status = Status::OutOfMemory;
         return (p, info);
     }
-    if DEBUG_LEVEL != 0 {
-        print!("slen {}\n", slen)
-    }
+    debug1_print!("slen {}\n", slen);
 
     let mut s: Vec<i32> = vec![0; slen as usize];
 

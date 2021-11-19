@@ -67,11 +67,9 @@ pub fn preprocess(
         }
     }
 
-    if DEBUG_LEVEL != 0 {
-        debug_assert!(valid(n, n, &r_p, &r_i) == Status::OK);
-        for j in 0..n {
-            debug_assert!(w[j as usize] == r_p[j as usize + 1])
-        }
+    debug_assert!(valid(n, n, &r_p, &r_i) == Status::OK);
+    for j in 0..n {
+        debug_assert!(w[j as usize] == r_p[j as usize + 1])
     }
 
     return (r_p, r_i);
