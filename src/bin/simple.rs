@@ -15,11 +15,15 @@ fn main() {
     ];
     let control = default_control_settings();
 
-    let (permutation, _info) = order(n, &a_p, &a_i, &control).unwrap();
+    let (p, p_inv, _info) = order(n, &a_p, &a_i, &control).unwrap();
 
-    println!("P = {:?}", permutation);
+    println!("P = {:?}", p);
     // Output:
-    //   [0 3 2 4 1]
+    //   P = [0, 3, 2, 4, 1]
+
+    println!("PInv = {:?}", p_inv);
+    // Output:
+    //   PInv = [0, 4, 2, 1, 3]
 
     amd_order::info::info(&info);
 }

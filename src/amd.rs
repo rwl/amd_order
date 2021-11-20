@@ -42,6 +42,26 @@ pub struct Info {
     pub d_max: i32,
 }
 
+impl Info {
+    pub fn new(n: i32) -> Info {
+        Info {
+            status: Status::OK,
+            n,
+            nz: 0,
+            symmetry: false,
+            nz_diag: 0,
+            nz_a_plus_at: 0,
+            n_dense: 0,
+            n_cmp_a: 0,
+            lnz: 0,
+            n_div: 0,
+            n_mult_subs_ldl: 0,
+            n_mult_subs_lu: 0,
+            d_max: 0,
+        }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub enum Status {
     OK,

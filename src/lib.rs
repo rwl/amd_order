@@ -27,29 +27,16 @@ pub fn order(
     a_p: &[i32],
     a_i: &[i32],
     control: &Control,
-) -> Result<(Vec<i32>, Info), Status> {
-    let mut info = Info {
-        status: Status::OK,
-        n,
-        nz: 0,
-        symmetry: false,
-        nz_diag: 0,
-        nz_a_plus_at: 0,
-        n_dense: 0,
-        n_cmp_a: 0,
-        lnz: 0,
-        n_div: 0,
-        n_mult_subs_ldl: 0,
-        n_mult_subs_lu: 0,
-        d_max: 0,
-    };
+) -> Result<(Vec<i32>, Vec<i32>, Info), Status> {
+    let mut info = Info::new(n);
 
     if n < 0 {
         return Err(Status::Invalid);
     }
     if n == 0 {
         let p: Vec<i32> = Vec::new();
-        return Ok((p, info));
+        let p_inv: Vec<i32> = Vec::new();
+        return Ok((p, p_inv, info));
     }
     let nz: i32 = a_p[n as usize];
     info.nz = nz;
@@ -81,9 +68,9 @@ pub fn order(
     debug1_print!("iwlen {}\n", iwlen);
 
     // Order the matrix.
-    let (p, _p_inv) = amd_1(n, &c_p, &c_i, &mut len, iwlen, &control, &mut info);
+    let (p, p_inv) = amd_1(n, &c_p, &c_i, &mut len, iwlen, &control, &mut info);
 
     info.status = status;
 
-    return Ok((p, info));
+    return Ok((p, p_inv, info));
 }
