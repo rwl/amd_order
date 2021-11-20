@@ -1,16 +1,14 @@
 use crate::internal::*;
 use crate::post_tree::post_tree;
 
-pub fn postorder(
-    nn: i32,
-    parent: &[i32],
-    nv: &[i32],
-    f_size: &[i32],
-    mut order: &mut [i32],
-    mut child: &mut [i32],
-    sibling: &mut [i32],
-    mut stack: &mut [i32],
-) {
+pub fn postorder(nn: i32, parent: &[i32], nv: &[i32], f_size: &[i32]) -> Vec<i32> {
+    // output
+    let mut order: Vec<i32> = vec![0; nn as usize];
+
+    // local workspace
+    let mut child: Vec<i32> = vec![0; nn as usize];
+    let mut sibling: Vec<i32> = vec![0; nn as usize];
+
     for j in 0..nn {
         child[j as usize] = EMPTY;
         sibling[j as usize] = EMPTY;
@@ -173,7 +171,10 @@ the biggest child last in each list:"
     for i in 0..nn {
         if parent[i as usize] == EMPTY && nv[i as usize] > 0 {
             debug1_print!("Root of assembly tree {}\n", i);
-            k = post_tree(i, k, &mut child, sibling, &mut order, &mut stack, nn);
+            // k = post_tree(i, k, &mut child, sibling, &mut order, &mut stack, nn);
+            k = post_tree(i, k, &mut child, &sibling, &mut order, nn);
         }
     }
+
+    order
 }

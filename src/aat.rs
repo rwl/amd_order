@@ -3,14 +3,10 @@ use crate::internal::EMPTY;
 use crate::internal::*;
 use crate::valid::valid;
 
-pub fn aat(
-    n: i32,
-    a_p: &[i32],
-    a_i: &[i32],
-    len: &mut [i32],
-    t_p: &mut [i32],
-    info: &mut Info,
-) -> i32 {
+pub fn aat(n: i32, a_p: &[i32], a_i: &[i32], info: &mut Info) -> (i32, Vec<i32>) {
+    let mut len: Vec<i32> = vec![0; n as usize]; // output
+    let mut t_p: Vec<i32> = vec![0; n as usize]; // local workspace
+
     #[cfg(feature = "debug1")]
     for k in 0..n {
         t_p[k as usize] = EMPTY
@@ -148,5 +144,5 @@ pub fn aat(
     info.nz_diag = nzdiag; // Nonzeros on diagonal of A.
     info.nz_a_plus_at = nzaat; // Nonzeros in A+A'.
 
-    nzaat
+    (nzaat, len)
 }

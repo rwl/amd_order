@@ -15,7 +15,7 @@ fn main() {
     ];
     let control = default_control_settings();
 
-    let (permutation, info) = order(n, &a_p, &a_i, control);
+    let (permutation, _info) = order(n, &a_p, &a_i, &control).unwrap();
 
     println!("P = {:?}", permutation);
     // Output:

@@ -7,41 +7,24 @@ pub fn amd_1(
     n: i32,
     a_p: &[i32],
     a_i: &[i32],
-    p: &mut [i32],
-    p_inv: &mut [i32],
     mut len: &mut [i32],
-    slen: i32,
-    s: &mut [i32],
-    // mut s: &Vec<i32>,
-    control: Control,
+    iwlen: i32,
+    control: &Control,
     mut info: &mut Info,
-) {
+) -> (Vec<i32>, Vec<i32>) {
     // Construct the matrix for amd_2.
 
     debug_assert!(n > 0);
 
-    let iwlen = slen - 6 * n;
-    let (p_e, s) = s.split_at_mut(n as usize);
-    let (n_v, s) = s.split_at_mut(n as usize);
-    let (head, s) = s.split_at_mut(n as usize);
-    let (e_len, s) = s.split_at_mut(n as usize);
-    let (degree, s) = s.split_at_mut(n as usize);
-    let (w, s) = s.split_at_mut(n as usize);
-    let (i_w, _s) = s.split_at_mut(iwlen as usize);
-    // let mut p_e: Vec<i32> = vec![0; n];
-    // let mut n_v: Vec<i32> = vec![0; n];
-    // let mut head: Vec<i32> = vec![0; n];
-    // let mut e_len: Vec<i32> = vec![0; n];
-    // let mut degree: Vec<i32> = vec![0; n];
-    // let mut w: Vec<i32> = vec![0; n];
-    // let mut i_w: Vec<i32> = vec![0; iwlen];
+    let mut p_e: Vec<i32> = vec![0; n as usize];
+    let mut s_p: Vec<i32> = vec![0; n as usize];
+    let mut t_p: Vec<i32> = vec![0; n as usize];
+    let mut i_w: Vec<i32> = vec![0; iwlen as usize];
 
     debug_assert!(valid(n, n, a_p, a_i) == Status::OK);
 
     // Construct the pointers for A+A'.
 
-    let s_p = n_v; // Use Nv and W as workspace for Sp and Tp.
-    let t_p = w;
     let mut pfree: i32 = 0;
     for j in 0..n {
         p_e[j as usize] = pfree;
@@ -186,13 +169,10 @@ pub fn amd_1(
 
     // Tp and Sp no longer needed.
 
-    let mut n_v = s_p;
-    let w = t_p;
-
     // Order the matrix.
+    let (_nv, p_inv, p, _e_len) = amd_2(
+        n, &mut p_e, &mut i_w, &mut len, iwlen, pfree, &control, &mut info,
+    );
 
-    amd_2(
-        n, p_e, i_w, &mut len, iwlen, pfree, &mut n_v, p_inv, p, head, e_len, degree, w, control,
-        &mut info,
-    )
+    (p, p_inv)
 }

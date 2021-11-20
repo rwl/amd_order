@@ -138,7 +138,7 @@ fn main() {
     }
 
     // Order the matrix.
-    let (p, info) = order(n as i32, &a_p, &a_i, control);
+    let (p, info) = order(n as i32, &a_p, &a_i, &control).unwrap();
     print!(
         "return value from amd_order: {:?} (should be {:?})\n",
         info.status,

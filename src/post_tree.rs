@@ -3,12 +3,13 @@ use crate::internal::*;
 pub fn post_tree(
     root: i32,
     mut k: i32,
-    child: &mut [i32],
-    sibling: &[i32],
-    order: &mut [i32],
-    stack: &mut [i32],
+    child: &mut [i32], // input of size nn, undefined on output
+    sibling: &[i32],   // input of size nn, not modified
+    order: &mut [i32], // output of size nn
     nn: i32,
 ) -> i32 {
+    let mut stack: Vec<i32> = vec![0; nn as usize];
+
     /*if false {
         // Recursive version (stack[] is not used):
         // this is simple, but can can cause stack overflow if nn is large

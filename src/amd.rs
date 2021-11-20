@@ -45,7 +45,6 @@ pub struct Info {
 #[derive(Debug, PartialEq)]
 pub enum Status {
     OK,
-    OutOfMemory,
     /// Input arguments are not valid.
     Invalid,
     /// Input matrix is OK for order, but columns were not sorted, and/or

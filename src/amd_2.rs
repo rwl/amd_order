@@ -20,22 +20,25 @@ fn clear_flag(wflg: i32, wbig: i32, w: &mut [i32], n: i32) -> i32 {
 
 pub fn amd_2(
     n: i32,
-    pe: &mut [i32],
-    iw: &mut [i32],
-    len: &mut [i32],
+    pe: &mut [i32],  // input/output
+    iw: &mut [i32],  // input/modified (undefined on output)
+    len: &mut [i32], // input/modified (undefined on output)
     iwlen: i32,
     mut pfree: i32,
-    nv: &mut [i32],
-    next: &mut [i32],
-    last: &mut [i32],
-    head: &mut [i32],
-    e_len: &mut [i32],
-    degree: &mut [i32],
-    w: &mut [i32],
-    control: Control,
+    control: &Control,
     info: &mut Info,
-) {
-    // let mut pfree = pfree_;
+) -> (Vec<i32>, Vec<i32>, Vec<i32>, Vec<i32>) {
+    // local workspace (not input or output - used only during execution)
+    let mut head: Vec<i32> = vec![0; n as usize];
+    let mut degree: Vec<i32> = vec![0; n as usize];
+    let mut w: Vec<i32> = vec![0; n as usize];
+
+    // output
+    let mut nv: Vec<i32> = vec![0; n as usize];
+    let mut next: Vec<i32> = vec![0; n as usize];
+    let mut last: Vec<i32> = vec![0; n as usize];
+    let mut e_len: Vec<i32> = vec![0; n as usize];
+
     let mut hash: u32; // unsigned, so that hash % n is well defined.
 
     // Any parameter (Pe[...] or pfree) or local variable starting with "p" (for
@@ -102,14 +105,14 @@ pub fn amd_2(
     debug1_print!("\n======Nel {} initial\n", nel);
     #[cfg(feature = "debug1")]
     dump(
-        n, pe, iw, len, iwlen, pfree, nv, next, last, head, e_len, degree, w, -1,
+        n, pe, iw, len, iwlen, pfree, &nv, &next, &last, &head, &e_len, &degree, &w, -1,
     );
 
     // INT_MAX - n for the int version, UF_long_max - n for the
     // int64 version. wflg is not allowed to be >= wbig.
     let wbig = std::i32::MAX - n;
     // Used for flagging the W array. See description of Iw.
-    let mut wflg = clear_flag(0, wbig, w, n);
+    let mut wflg = clear_flag(0, wbig, &mut w, n);
 
     // Initialize degree lists and eliminate dense and empty rows.
 
@@ -161,7 +164,7 @@ pub fn amd_2(
         debug1_print!("\n======Nel {}\n", nel);
         #[cfg(feature = "debug2")]
         dump(
-            n, pe, iw, len, iwlen, pfree, nv, next, last, head, e_len, degree, w, nel,
+            n, pe, iw, len, iwlen, pfree, &nv, &next, &last, &head, &e_len, &degree, &w, nel,
         );
 
         // Get pivot of minimum degree.
@@ -445,7 +448,7 @@ pub fn amd_2(
 
         // With the current value of wflg, wflg+n must not cause integer overflow.
 
-        wflg = clear_flag(wflg, wbig, w, n);
+        wflg = clear_flag(wflg, wbig, &mut w, n);
 
         // compute(W [e] - wflg) = |Le\Lme| for all elements.
 
@@ -689,7 +692,7 @@ pub fn amd_2(
         // Make sure that wflg+n does not cause integer overflow.
         lemax = max(lemax, degme);
         wflg += lemax;
-        wflg = clear_flag(wflg, wbig, w, n);
+        wflg = clear_flag(wflg, wbig, &mut w, n);
         // at this point, W[0..n-1] < wflg holds
 
         /* Supervariable Detection */
@@ -1093,8 +1096,7 @@ pub fn amd_2(
     }
 
     // postorder the assembly tree
-
-    postorder(n, pe, nv, e_len, w, head, next, last);
+    let order/*w*/ = postorder(n, pe, &nv, &e_len);
 
     // Compute output permutation and inverse permutation.
 
@@ -1107,7 +1109,8 @@ pub fn amd_2(
         next[k as usize] = EMPTY;
     }
     for e in 0..n {
-        let k = w[e as usize];
+        // let k = w[e as usize];
+        let k = order[e as usize];
         debug_assert!((k == EMPTY) == (nv[e as usize] == 0));
         if k != EMPTY {
             debug_assert!(k >= 0 && k < n);
@@ -1158,4 +1161,6 @@ pub fn amd_2(
         last[k as usize] = i;
         debug2_print!("   perm [{}] = {}\n", k, i);
     }
+
+    (nv, next, last, e_len)
 }
