@@ -20,24 +20,24 @@ fn clear_flag(wflg: i32, wbig: i32, w: &mut [i32], n: i32) -> i32 {
 
 pub fn amd_2(
     n: i32,
-    pe: &mut [i32],  // input/output
-    iw: &mut [i32],  // input/modified (undefined on output)
-    len: &mut [i32], // input/modified (undefined on output)
+    pe: &mut [isize], // input/output
+    iw: &mut [isize], // input/modified (undefined on output)
+    len: &mut [i32],  // input/modified (undefined on output)
     iwlen: i32,
     mut pfree: i32,
     control: &Control,
     info: &mut Info,
-) -> (Vec<i32>, Vec<i32>, Vec<i32>, Vec<i32>) {
+) -> (Vec<i32>, Vec<i32>, Vec<i32>, Vec<isize>) {
     // local workspace (not input or output - used only during execution)
-    let mut head: Vec<i32> = vec![0; n as usize];
+    let mut head: Vec<isize> = vec![0; n as usize];
     let mut degree: Vec<i32> = vec![0; n as usize];
     let mut w: Vec<i32> = vec![0; n as usize];
 
     // output
-    let mut nv: Vec<i32> = vec![0; n as usize];
-    let mut next: Vec<i32> = vec![0; n as usize];
-    let mut last: Vec<i32> = vec![0; n as usize];
-    let mut e_len: Vec<i32> = vec![0; n as usize];
+    let mut nv: Vec<isize> = vec![0; n as usize];
+    let mut next: Vec<isize> = vec![0; n as usize];
+    let mut last: Vec<isize> = vec![0; n as usize];
+    let mut e_len: Vec<isize> = vec![0; n as usize];
 
     let mut hash: u32; // unsigned, so that hash % n is well defined.
 
@@ -57,23 +57,23 @@ pub fn amd_2(
     /* Initialize Output Statistics */
 
     // The number of nonzeros in L (excluding the diagonal).
-    let mut lnz = 0;
+    let mut lnz: i32 = 0;
     // Number of divisions for LU or LDL' factorizations.
-    let mut ndiv = 0;
+    let mut ndiv: i32 = 0;
     // Number of multiply-subtract pairs for LU factorization.
-    let mut nms_lu = 0;
+    let mut nms_lu: i32 = 0;
     // Number of multiply-subtract pairs for LDL' factorization.
-    let mut nms_ldl = 0;
+    let mut nms_ldl: i32 = 0;
     // The largest number of entries in any column of L, including the diagonal.
-    let mut dmax = 1;
+    let mut dmax: i32 = 1;
     // Current supervariable being eliminated, and the current
     // element created by eliminating that supervariable.
-    let mut me = EMPTY;
+    let mut me: isize = EMPTY;
 
-    let mut mindeg = 0; // Current minimum degree.
-    let mut ncmpa = 0; // Number of garbage collections.
-    let mut nel = 0; // Number of pivots selected so far.
-    let mut lemax = 0; // Largest |Le| seen so far (called dmax in Fortran version).
+    let mut mindeg: i32 = 0; // Current minimum degree.
+    let mut ncmpa: i32 = 0; // Number of garbage collections.
+    let mut nel: i32 = 0; // Number of pivots selected so far.
+    let mut lemax: i32 = 0; // Largest |Le| seen so far (called dmax in Fortran version).
 
     // Get control parameters.
     let aggressive = if control.aggressive { 1 } else { 0 };
@@ -116,7 +116,7 @@ pub fn amd_2(
 
     // Initialize degree lists and eliminate dense and empty rows.
 
-    let mut ndense = 0; // Number of "dense" rows/columns.
+    let mut ndense: i32 = 0; // Number of "dense" rows/columns.
 
     for i in 0..n {
         let deg = degree[i as usize]; // The degree of a variable or element.
@@ -150,12 +150,12 @@ pub fn amd_2(
 
             let inext = head[deg as usize]; // The entry in a link list following i.
 
-            debug_assert!(inext >= EMPTY && inext < n);
+            debug_assert!(inext >= EMPTY && inext < n as isize);
             if inext != EMPTY {
-                last[inext as usize] = i;
+                last[inext as usize] = i as isize;
             }
             next[i as usize] = inext;
-            head[deg as usize] = i;
+            head[deg as usize] = i as isize;
         }
     }
 
@@ -181,13 +181,13 @@ pub fn amd_2(
             deg += 1;
         }
         mindeg = deg;
-        debug_assert!(me >= 0 && me < n);
+        debug_assert!(me >= 0 && me < n as isize);
         debug1_print!("=================me: {}\n", me);
 
         // Remove chosen variable from link list.
         let mut inext = next[me as usize]; // The entry in a link list following i.
 
-        debug_assert!(inext >= EMPTY && inext < n);
+        debug_assert!(inext >= EMPTY && inext < n as isize);
         if inext != EMPTY {
             last[inext as usize] = EMPTY;
         }
@@ -199,7 +199,7 @@ pub fn amd_2(
         let mut nvpiv = nv[me as usize]; // Number of pivots in current element.
 
         debug_assert!(nvpiv > 0);
-        nel += nvpiv;
+        nel += nvpiv as i32;
 
         // Construct new element.
 
@@ -211,20 +211,20 @@ pub fn amd_2(
 
         // Flag the variable "me" as being in Lme by negating Nv[me].
         nv[me as usize] = -nvpiv;
-        let mut degme = 0; // Size, |Lme|, of the current element, me (= degree[me]).
+        let mut degme: isize = 0; // Size, |Lme|, of the current element, me (= degree[me]).
 
-        debug_assert!(pe[me as usize] >= 0 && pe[me as usize] < iwlen);
+        debug_assert!(pe[me as usize] >= 0 && pe[me as usize] < iwlen as isize);
 
         let mut pme1: i32; // The current element, me, is stored in Iw[pme1...pme2].
         let mut pme2: i32; // The end of the current element.
         if elenme == 0 {
             // Construct the new element in place.
-            pme1 = pe[me as usize];
+            pme1 = pe[me as usize] as i32;
             pme2 = pme1 - 1;
 
             for p in pme1..=pme1 + len[me as usize] - 1 {
                 let i = iw[p as usize];
-                debug_assert!(i >= 0 && i < n && nv[i as usize] >= 0);
+                debug_assert!(i >= 0 && i < n as isize && nv[i as usize] >= 0);
 
                 let nvi = nv[i as usize]; // The number of variables in a supervariable i (= Nv[i])
                 if nvi > 0 {
@@ -240,8 +240,8 @@ pub fn amd_2(
                     // Remove variable i from degree list.
                     let ilast = last[i as usize]; // The entry in a link list preceding i.
                     inext = next[i as usize];
-                    debug_assert!(ilast >= EMPTY && ilast < n);
-                    debug_assert!(inext >= EMPTY && inext < n);
+                    debug_assert!(ilast >= EMPTY && ilast < n as isize);
+                    debug_assert!(inext >= EMPTY && inext < n as isize);
 
                     if inext != EMPTY {
                         last[inext as usize] = ilast;
@@ -260,11 +260,11 @@ pub fn amd_2(
             let mut p = pe[me as usize];
             pme1 = pfree;
             // Number of variables in variable list of pivotal variable.
-            let slenme = len[me as usize] - elenme;
+            let slenme = len[me as usize] - elenme as i32;
 
             for knt1 in 1..=elenme + 1 {
-                let e: i32;
-                let mut pj: i32;
+                let e: isize;
+                let mut pj: isize;
                 let ln: i32;
                 if knt1 > elenme {
                     // Search the supervariables in me.
@@ -276,7 +276,7 @@ pub fn amd_2(
                     // Search the elements in me.
                     e = iw[p as usize];
                     p += 1;
-                    debug_assert!(e >= 0 && e < n);
+                    debug_assert!(e >= 0 && e < n as isize);
 
                     pj = pe[e as usize];
                     ln = len[e as usize];
@@ -284,7 +284,7 @@ pub fn amd_2(
                     debug2_print!("Search element e {} in me {}\n", e, me);
                     debug_assert!(e_len[e as usize] < EMPTY && w[e as usize] > 0 && pj >= 0);
                 }
-                debug_assert!(ln >= 0 && (ln == 0 || (pj >= 0 && pj < iwlen)));
+                debug_assert!(ln >= 0 && (ln == 0 || (pj >= 0 && pj < iwlen as isize)));
 
                 // search for different supervariables and add them to the
                 // new list, compressing when necessary. this loop is
@@ -294,7 +294,9 @@ pub fn amd_2(
                 for knt2 in 1..=ln {
                     let i = iw[pj as usize];
                     pj += 1;
-                    debug_assert!(i >= 0 && i < n && (i == me || e_len[i as usize] >= EMPTY));
+                    debug_assert!(
+                        i >= 0 && i < n as isize && (i == me || e_len[i as usize] >= EMPTY)
+                    );
 
                     // The number of variables in a supervariable i (= Nv[i]).
                     let nvi = nv[i as usize];
@@ -317,7 +319,7 @@ pub fn amd_2(
                             // remaining entries.
 
                             pe[me as usize] = p;
-                            len[me as usize] -= knt1;
+                            len[me as usize] -= knt1 as i32;
                             // Check if nothing left of supervariable me.
                             if len[me as usize] == 0 {
                                 pe[me as usize] = EMPTY;
@@ -336,16 +338,16 @@ pub fn amd_2(
                             for j in 0..n {
                                 let pn = pe[j as usize];
                                 if pn >= 0 {
-                                    debug_assert!(pn >= 0 && pn < iwlen);
+                                    debug_assert!(pn >= 0 && pn < iwlen as isize);
 
                                     pe[j as usize] = iw[pn as usize];
-                                    iw[pn as usize] = flip(j);
+                                    iw[pn as usize] = flip(j as isize);
                                 }
                             }
 
                             // psrc/pdst point to source/destination
-                            let mut psrc = 0;
-                            let mut pdst = 0;
+                            let mut psrc: i32 = 0;
+                            let mut pdst: i32 = 0;
                             let pend = pme1 - 1;
 
                             while psrc <= pend {
@@ -356,7 +358,7 @@ pub fn amd_2(
                                     debug2_print!("Got object j: {}\n", j);
 
                                     iw[pdst as usize] = pe[j as usize];
-                                    pe[j as usize] = pdst;
+                                    pe[j as usize] = pdst as isize;
                                     pdst += 1;
                                     let lenj = len[j as usize];
                                     // Copy from source to destination.
@@ -376,7 +378,7 @@ pub fn amd_2(
                                 pdst += 1;
                                 psrc += 1;
                             }
-                            pme1 = p1;
+                            pme1 = p1 as i32;
                             pfree = pdst;
                             pj = pe[e as usize];
                             p = pe[me as usize];
@@ -396,8 +398,8 @@ pub fn amd_2(
 
                         let ilast = last[i as usize]; // The entry in a link list preceding i.
                         inext = next[i as usize];
-                        debug_assert!(ilast >= EMPTY && ilast < n);
-                        debug_assert!(inext >= EMPTY && inext < n);
+                        debug_assert!(ilast >= EMPTY && ilast < n as isize);
+                        debug_assert!(inext >= EMPTY && inext < n as isize);
 
                         if inext != EMPTY {
                             last[inext as usize] = ilast;
@@ -429,10 +431,10 @@ pub fn amd_2(
         // me has now been converted into an element in Iw[pme1..pme2]
 
         // degme holds the external degree of new element.
-        degree[me as usize] = degme;
-        pe[me as usize] = pme1;
+        degree[me as usize] = degme as i32;
+        pe[me as usize] = pme1 as isize;
         len[me as usize] = pme2 - pme1 + 1;
-        debug_assert!(pe[me as usize] >= 0 && pe[me as usize] < iwlen);
+        debug_assert!(pe[me as usize] >= 0 && pe[me as usize] < iwlen as isize);
 
         e_len[me as usize] = flip(nvpiv + degme);
         // flip(Elen(me)) is now the degree of pivot (including diagonal part).
@@ -467,20 +469,20 @@ pub fn amd_2(
         debug2_print!("me: ");
         for pme in pme1..=pme2 {
             let i = iw[pme as usize];
-            debug_assert!(i >= 0 && i < n);
+            debug_assert!(i >= 0 && i < n as isize);
 
             let eln = e_len[i as usize]; // The length, Elen[...], of an element list.
             debug3_print!("{} Elen {}: \n", i, eln);
 
             if eln > 0 {
                 // Note that Nv[i] has been negated to denote i in Lme:
-                let nvi = -nv[i as usize];
-                debug_assert!(nvi > 0 && pe[i as usize] >= 0 && pe[i as usize] < iwlen);
+                let nvi: isize = -nv[i as usize];
+                debug_assert!(nvi > 0 && pe[i as usize] >= 0 && pe[i as usize] < iwlen as isize);
 
-                let wnvi = wflg - nvi;
+                let wnvi = wflg - nvi as i32;
                 for p in pe[i as usize]..=pe[i as usize] + eln - 1 {
                     let e = iw[p as usize];
-                    debug_assert!(e >= 0 && e < n);
+                    debug_assert!(e >= 0 && e < n as isize);
 
                     let mut we = w[e as usize];
                     debug4_print!("    e {} we {} ", e, we);
@@ -488,7 +490,7 @@ pub fn amd_2(
                     if we >= wflg {
                         // Unabsorbed element e has been seen in this loop.
                         debug4_print!("    unabsorbed, first time seen");
-                        we -= nvi;
+                        we -= nvi as i32;
                     } else if we != 0 {
                         // e is an unabsorbed element.
                         // This is the first we have seen e in all of Scan 1.
@@ -511,7 +513,7 @@ pub fn amd_2(
 
         for pme in pme1..=pme2 {
             let i = iw[pme as usize];
-            debug_assert!(i >= 0 && i < n && nv[i as usize] < 0 && e_len[i as usize] >= 0);
+            debug_assert!(i >= 0 && i < n as isize && nv[i as usize] < 0 && e_len[i as usize] >= 0);
             debug2_print!(
                 "Updating: i {} {} {}\n",
                 i,
@@ -519,12 +521,12 @@ pub fn amd_2(
                 len[i as usize]
             );
 
-            let p1 = pe[i as usize];
-            let p2 = p1 + e_len[i as usize] - 1;
+            let p1: isize = pe[i as usize];
+            let p2: isize = p1 + e_len[i as usize] - 1;
             let mut pn = p1;
             hash = 0;
             deg = 0;
-            debug_assert!(p1 >= 0 && p1 < iwlen && p2 >= -1 && p2 < iwlen);
+            debug_assert!(p1 >= 0 && p1 < iwlen as isize && p2 >= -1 && p2 < iwlen as isize);
 
             // scan the element list associated with supervariable i .
 
@@ -532,7 +534,7 @@ pub fn amd_2(
             if aggressive != 0 {
                 for p in p1..=p2 {
                     let e = iw[p as usize];
-                    debug_assert!(e >= 0 && e < n);
+                    debug_assert!(e >= 0 && e < n as isize);
 
                     let we = w[e as usize];
                     if we != 0 {
@@ -556,7 +558,7 @@ pub fn amd_2(
             } else {
                 for p in p1..=p2 {
                     let e = iw[p as usize];
-                    debug_assert!(e >= 0 && e < n);
+                    debug_assert!(e >= 0 && e < n as isize);
                     let we = w[e as usize];
                     if we != 0 {
                         // e is an unabsorbed element.
@@ -580,16 +582,16 @@ pub fn amd_2(
             // particularly if the matrix has many dense rows that are not
             // removed prior to ordering.
             let p3 = pn;
-            let p4 = p1 + len[i as usize];
+            let p4 = p1 + len[i as usize] as isize;
             for p in p2 + 1..p4 {
                 let j = iw[p as usize];
-                debug_assert!(j >= 0 && j < n);
+                debug_assert!(j >= 0 && j < n as isize);
 
                 let nvj = nv[j as usize];
                 if nvj > 0 {
                     // j is unabsorbed, and not in Lme.
                     // Add to degree and add to new list.
-                    deg += nvj;
+                    deg += nvj as i32;
                     iw[pn as usize] = j;
                     pn += 1;
                     hash += j as u32;
@@ -634,7 +636,7 @@ pub fn amd_2(
                 let nvi = -nv[i as usize];
                 degme -= nvi;
                 nvpiv += nvi;
-                nel += nvi;
+                nel += nvi as i32;
                 nv[i as usize] = 0;
                 e_len[i as usize] = EMPTY;
             } else {
@@ -654,7 +656,7 @@ pub fn amd_2(
                 // Add new element, me, to front of list.
                 iw[p1 as usize] = me;
                 // Store the new length of the list in Len[i].
-                len[i as usize] = pn - p1 + 1;
+                len[i as usize] = (pn - p1 + 1) as i32;
 
                 // Place in hash bucket. Save hash key of i in Last[i].
 
@@ -681,17 +683,17 @@ pub fn amd_2(
                 // 	Next [i] = Hhead[hash]
                 // 	Hhead [hash] = i
 
-                last[i as usize] = hash as i32;
+                last[i as usize] = hash as isize;
             }
         }
 
-        degree[me as usize] = degme;
+        degree[me as usize] = degme as i32;
 
         // Clear the counter array, W [...], by incrementing wflg.
 
         // Make sure that wflg+n does not cause integer overflow.
-        lemax = max(lemax, degme);
-        wflg += lemax;
+        lemax = max(lemax, degme as i32);
+        wflg += lemax as i32;
         wflg = clear_flag(wflg, wbig, &mut w, n);
         // at this point, W[0..n-1] < wflg holds
 
@@ -700,7 +702,7 @@ pub fn amd_2(
         debug1_print!("Detecting supervariables:\n");
         for pme in pme1..=pme2 {
             let mut i = iw[pme as usize];
-            debug_assert!(i >= 0 && i < n);
+            debug_assert!(i >= 0 && i < n as isize);
             debug2_print!("Consider i {} nv {}\n", i, nv[i as usize]);
 
             if nv[i as usize] < 0 {
@@ -711,7 +713,7 @@ pub fn amd_2(
                 // the pattern Lme of the current element, me.
 
                 // Let i = head of hash bucket, and empty the hash bucket.
-                debug_assert!(last[i as usize] >= 0 && last[i as usize] < n);
+                debug_assert!(last[i as usize] >= 0 && last[i as usize] < n as isize);
                 hash = last[i as usize] as u32;
 
                 // If Hhead array is not used:
@@ -733,7 +735,7 @@ pub fn amd_2(
                 // i = Hhead[hash]
                 // Hhead[hash] = empty
 
-                debug_assert!(i >= EMPTY && i < n);
+                debug_assert!(i >= EMPTY && i < n as isize);
                 debug2_print!("----i {} hash {}\n", i, hash);
 
                 while i != EMPTY && next[i as usize] != EMPTY {
@@ -744,11 +746,11 @@ pub fn amd_2(
                     let ln = len[i as usize];
                     let eln = e_len[i as usize];
                     debug_assert!(ln >= 0 && eln >= 0);
-                    debug_assert!(pe[i as usize] >= 0 && pe[i as usize] < iwlen);
+                    debug_assert!(pe[i as usize] >= 0 && pe[i as usize] < iwlen as isize);
 
                     // Do not flag the first element in the list(me).
-                    for p in pe[i as usize] + 1..=pe[i as usize] + ln - 1 {
-                        debug_assert!(iw[p as usize] >= 0 && iw[p as usize] < n);
+                    for p in pe[i as usize] + 1..=pe[i as usize] + ln as isize - 1 {
+                        debug_assert!(iw[p as usize] >= 0 && iw[p as usize] < n as isize);
 
                         w[iw[p as usize] as usize] = wflg;
                     }
@@ -757,7 +759,7 @@ pub fn amd_2(
 
                     let mut jlast = i;
                     j = next[i as usize];
-                    debug_assert!(j >= EMPTY && j < n);
+                    debug_assert!(j >= EMPTY && j < n as isize);
 
                     while j != EMPTY {
                         // Check if j and i have identical nonzero pattern.
@@ -766,13 +768,13 @@ pub fn amd_2(
 
                         // Check if i and j have the same Len and Elen.
                         debug_assert!(len[j as usize] >= 0 && e_len[j as usize] >= 0);
-                        debug_assert!(pe[j as usize] >= 0 && pe[j as usize] < iwlen);
+                        debug_assert!(pe[j as usize] >= 0 && pe[j as usize] < iwlen as isize);
 
                         let mut ok = (len[j as usize] == ln) && (e_len[j as usize] == eln);
                         // Skip the first element in the list(me).
                         // TODO: for p := Pe[j] + 1; ok && p <= Pe[j]+ln-1; p++ {
-                        for p in pe[j as usize] + 1..=pe[j as usize] + ln - 1 {
-                            debug_assert!(iw[p as usize] >= 0 && iw[p as usize] < n);
+                        for p in pe[j as usize] + 1..=pe[j as usize] + ln as isize - 1 {
+                            debug_assert!(iw[p as usize] >= 0 && iw[p as usize] < n as isize);
 
                             if w[iw[p as usize] as usize] != wflg {
                                 ok = false;
@@ -800,7 +802,7 @@ pub fn amd_2(
                             debug_assert!(j != next[j as usize]);
                             j = next[j as usize];
                         }
-                        debug_assert!(j >= EMPTY && j < n);
+                        debug_assert!(j >= EMPTY && j < n as isize);
                     }
 
                     // No more variables can be absorbed into
@@ -808,7 +810,7 @@ pub fn amd_2(
 
                     wflg += 1;
                     i = next[i as usize];
-                    debug_assert!(i >= EMPTY && i < n);
+                    debug_assert!(i >= EMPTY && i < n as isize);
                 }
             }
         }
@@ -817,10 +819,10 @@ pub fn amd_2(
         // Restore degree lists and remove nonprincipal supervariables from element.
 
         let mut p = pme1;
-        let nleft = n - nel;
+        let nleft: i32 = n - nel;
         for pme in pme1..=pme2 {
             let i = iw[pme as usize];
-            debug_assert!(i >= 0 && i < n);
+            debug_assert!(i >= 0 && i < n as isize);
 
             let nvi = -nv[i as usize];
             debug3_print!("Restore i {} {}\n", i, nvi);
@@ -831,14 +833,14 @@ pub fn amd_2(
 
                 // Compute the external degree (add size of current element).
 
-                deg = degree[i as usize] + degme - nvi;
-                deg = min(deg, nleft - nvi);
+                deg = degree[i as usize] + degme as i32 - nvi as i32;
+                deg = min(deg, nleft - nvi as i32);
                 debug_assert!(implies(aggressive != 0, deg > 0) && deg >= 0 && deg < n);
 
                 // Place the supervariable at the head of the degree list.
 
                 inext = head[deg as usize];
-                debug_assert!(inext >= EMPTY && inext < n);
+                debug_assert!(inext >= EMPTY && inext < n as isize);
                 if inext != EMPTY {
                     last[inext as usize] = i;
                 }
@@ -885,8 +887,8 @@ pub fn amd_2(
         // (degme+ndense)-by-(degme+ndense).
 
         {
-            let f = nvpiv;
-            let r = degme + ndense;
+            let f = nvpiv as i32;
+            let r = degme as i32 + ndense;
             dmax = max(dmax, f + r);
 
             // Number of nonzeros in L (excluding the diagonal).
@@ -916,8 +918,8 @@ pub fn amd_2(
 
     {
         // Count the work to factorize the ndense-by-ndense submatrix.
-        let f = ndense;
-        dmax = max(dmax, ndense);
+        let f = ndense as i32;
+        dmax = max(dmax, ndense as i32);
 
         // Number of nonzeros in L (excluding the diagonal).
         let lnzme = (f - 1) * f / 2;
@@ -1060,7 +1062,7 @@ pub fn amd_2(
             debug1_print!("Path compression, i unordered: {}\n", i);
 
             let mut j = pe[i as usize];
-            debug_assert!(j >= EMPTY && j < n);
+            debug_assert!(j >= EMPTY && j < n as isize);
             debug3_print!(" j: {}\n", j);
             if j == EMPTY {
                 // Skip a dense variable. It has no parent.
@@ -1073,7 +1075,7 @@ pub fn amd_2(
                 debug3_print!("  j : {}\n", j);
                 j = pe[j as usize];
                 debug3_print!("  j:: {}\n", j);
-                debug_assert!(j >= 0 && j < n);
+                debug_assert!(j >= 0 && j < n as isize);
             }
             // Got to an element e.
             let e = j;
@@ -1083,14 +1085,14 @@ pub fn amd_2(
             // (all nodes point to e). Path compression allows this code to
             // compute in O(n) time.
 
-            j = i;
+            j = i as isize;
             // while (j is a variable)
             while nv[j as usize] == 0 {
                 let jnext = pe[j as usize];
                 debug3_print!("j {} jnext {}\n", j, jnext);
                 pe[j as usize] = e;
                 j = jnext;
-                debug_assert!(j >= 0 && j < n);
+                debug_assert!(j >= 0 && j < n as isize);
             }
         }
     }
@@ -1113,8 +1115,8 @@ pub fn amd_2(
         let k = order[e as usize];
         debug_assert!((k == EMPTY) == (nv[e as usize] == 0));
         if k != EMPTY {
-            debug_assert!(k >= 0 && k < n);
-            head[k as usize] = e;
+            debug_assert!(k >= 0 && k < n as isize);
+            head[k as usize] = e as isize;
         }
     }
 
@@ -1125,9 +1127,9 @@ pub fn amd_2(
         if e == EMPTY {
             break;
         }
-        debug_assert!(e >= 0 && e < n && nv[e as usize] > 0);
-        next[e as usize] = nel;
-        nel += nv[e as usize];
+        debug_assert!(e >= 0 && e < n as isize && nv[e as usize] > 0);
+        next[e as usize] = nel as isize;
+        nel += nv[e as usize] as i32;
     }
     debug_assert!(nel == n - ndense);
 
@@ -1135,7 +1137,7 @@ pub fn amd_2(
     for i in 0..n {
         if nv[i as usize] == 0 {
             let e = pe[i as usize];
-            debug_assert!(e >= EMPTY && e < n);
+            debug_assert!(e >= EMPTY && e < n as isize);
             if e != EMPTY {
                 // This is an unordered variable that was merged
                 // into element e via supernode detection or mass
@@ -1147,7 +1149,7 @@ pub fn amd_2(
             } else {
                 // This is a dense unordered variable, with no parent.
                 // Place it last in the output order.
-                next[i as usize] = nel;
+                next[i as usize] = nel as isize;
                 nel += 1;
             }
         }
@@ -1157,10 +1159,15 @@ pub fn amd_2(
     debug2_print!("\n\nPerm:\n");
     for i in 0..n {
         let k = next[i as usize];
-        debug_assert!(k >= 0 && k < n);
-        last[k as usize] = i;
+        debug_assert!(k >= 0 && k < n as isize);
+        last[k as usize] = i as isize;
         debug2_print!("   perm [{}] = {}\n", k, i);
     }
 
-    (nv, next, last, e_len)
+    (
+        nv.into_iter().map(|x| x as i32).collect(),
+        next.into_iter().map(|x| x as i32).collect(),
+        last.into_iter().map(|x| x as i32).collect(),
+        e_len,
+    )
 }

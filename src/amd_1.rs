@@ -16,10 +16,10 @@ pub fn amd_1(
 
     debug_assert!(n > 0);
 
-    let mut p_e: Vec<i32> = vec![0; n as usize];
+    let mut p_e: Vec<isize> = vec![0; n as usize];
     let mut s_p: Vec<i32> = vec![0; n as usize];
     let mut t_p: Vec<i32> = vec![0; n as usize];
-    let mut i_w: Vec<i32> = vec![0; iwlen as usize];
+    let mut i_w: Vec<isize> = vec![0; iwlen as usize];
 
     debug_assert!(valid(n, n, a_p, a_i) == Status::OK);
 
@@ -27,7 +27,7 @@ pub fn amd_1(
 
     let mut pfree: i32 = 0;
     for j in 0..n {
-        p_e[j as usize] = pfree;
+        p_e[j as usize] = pfree as isize;
         s_p[j as usize] = pfree;
         pfree += len[j as usize];
     }
@@ -69,10 +69,10 @@ pub fn amd_1(
                     debug_assert!(s_p[k as usize] < p_e[k as usize + 1]);
                 }
 
-                i_w[s_p[j as usize] as usize] = k;
+                i_w[s_p[j as usize] as usize] = k as isize;
                 s_p[j as usize] += 1;
 
-                i_w[s_p[k as usize] as usize] = j;
+                i_w[s_p[k as usize] as usize] = j as isize;
                 s_p[k as usize] += 1;
 
                 p += 1;
@@ -111,10 +111,10 @@ pub fn amd_1(
                         debug_assert!(s_p[j as usize] < p_e[j as usize + 1]);
                     }
 
-                    i_w[s_p[i as usize] as usize] = j;
+                    i_w[s_p[i as usize] as usize] = j as isize;
                     s_p[i as usize] += 1;
 
-                    i_w[s_p[j as usize] as usize] = i;
+                    i_w[s_p[j as usize] as usize] = i as isize;
                     s_p[j as usize] += 1;
 
                     pj += 1;
@@ -153,10 +153,10 @@ pub fn amd_1(
                 debug_assert!(s_p[j as usize] < p_e[j as usize + 1]);
             }
 
-            i_w[s_p[i as usize] as usize] = j;
+            i_w[s_p[i as usize] as usize] = j as isize;
             s_p[i as usize] += 1;
 
-            i_w[s_p[j as usize] as usize] = i;
+            i_w[s_p[j as usize] as usize] = i as isize;
             s_p[j as usize] += 1;
         }
     }

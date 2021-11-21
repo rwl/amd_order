@@ -34,8 +34,8 @@ pub fn order(
         return Err(Status::Invalid);
     }
     if n == 0 {
-        let p: Vec<i32> = Vec::new();
-        let p_inv: Vec<i32> = Vec::new();
+        let p = Vec::new();
+        let p_inv = Vec::new();
         return Ok((p, p_inv, info));
     }
     let nz: i32 = a_p[n as usize];

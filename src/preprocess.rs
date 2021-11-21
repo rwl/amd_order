@@ -16,7 +16,7 @@ pub fn preprocess(
     debug_assert!(valid(n, n, a_p, a_i) != Status::Invalid);
 
     let mut w: Vec<i32> = vec![0; n as usize];
-    let mut flag: Vec<i32> = vec![0; n as usize];
+    let mut flag: Vec<isize> = vec![0; n as usize];
 
     // Count the entries in each row of A (excluding duplicates).
 
@@ -28,10 +28,10 @@ pub fn preprocess(
         let p2 = a_p[j as usize + 1];
         for p in a_p[j as usize]..p2 {
             let i = a_i[p as usize];
-            if flag[i as usize] != j {
+            if flag[i as usize] != j as isize {
                 // Row index i has not yet appeared in column j.
                 w[i as usize] += 1; // One more entry in row i.
-                flag[i as usize] = j; // Flag row index i as appearing in col j.
+                flag[i as usize] = j as isize; // Flag row index i as appearing in col j.
             }
         }
     }
@@ -58,11 +58,11 @@ pub fn preprocess(
         let p2 = a_p[j as usize + 1];
         for p in a_p[j as usize]..p2 {
             let i = a_i[p as usize];
-            if flag[i as usize] != j {
+            if flag[i as usize] != j as isize {
                 // Row index i has not yet appeared in column j.
                 r_i[w[i as usize] as usize] = j; // Put col j in row i.
                 w[i as usize] += 1;
-                flag[i as usize] = j; // Flag row index i as appearing in col j.
+                flag[i as usize] = j as isize; // Flag row index i as appearing in col j.
             }
         }
     }

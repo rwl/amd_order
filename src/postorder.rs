@@ -1,13 +1,13 @@
 use crate::internal::*;
 use crate::post_tree::post_tree;
 
-pub fn postorder(nn: i32, parent: &[i32], nv: &[i32], f_size: &[i32]) -> Vec<i32> {
+pub fn postorder(nn: i32, parent: &[isize], nv: &[isize], f_size: &[isize]) -> Vec<isize> {
     // output
-    let mut order: Vec<i32> = vec![0; nn as usize];
+    let mut order: Vec<isize> = vec![0; nn as usize];
 
     // local workspace
-    let mut child: Vec<i32> = vec![0; nn as usize];
-    let mut sibling: Vec<i32> = vec![0; nn as usize];
+    let mut child: Vec<isize> = vec![0; nn as usize];
+    let mut sibling: Vec<isize> = vec![0; nn as usize];
 
     for j in 0..nn {
         child[j as usize] = EMPTY;
@@ -15,7 +15,7 @@ pub fn postorder(nn: i32, parent: &[i32], nv: &[i32], f_size: &[i32]) -> Vec<i32
     }
 
     // Place the children in link lists - bigger elements tend to be last.
-    let mut j = nn - 1;
+    let mut j: isize = nn as isize - 1;
     while j >= 0 {
         if nv[j as usize] > 0 {
             // This is an element.
@@ -82,7 +82,7 @@ the biggest child last in each list:"
 
                 let mut f = child[i as usize];
                 while f != EMPTY {
-                    debug_assert!(f >= 0 && f < nn);
+                    debug_assert!(f >= 0 && f < nn as isize);
                     debug1_print!("      f: {}  size: {}\n", f, f_size[f as usize]);
                     nchild += 1;
                     debug_assert!(nchild <= nn);
@@ -99,7 +99,7 @@ the biggest child last in each list:"
 
             let mut f = child[i as usize];
             while f != EMPTY {
-                debug_assert!(f >= 0 && f < nn);
+                debug_assert!(f >= 0 && f < nn as isize);
 
                 let frsize = f_size[f as usize];
                 if frsize >= maxfrsize {
@@ -150,7 +150,7 @@ the biggest child last in each list:"
                 debug1_print!("After partial sort, element {}\n", i);
                 let mut f = child[i as usize];
                 while f != EMPTY {
-                    debug_assert!(f >= 0 && f < nn);
+                    debug_assert!(f >= 0 && f < nn as isize);
                     debug1_print!("        {}  {}\n", f, f_size[f as usize]);
                     debug_assert!(nv[f as usize] > 0);
                     nchild -= 1;

@@ -26,13 +26,13 @@ pub fn valid(n_row: i32, n_col: i32, a_p: &[i32], a_i: &[i32]) -> Status {
             return Status::Invalid;
         }
 
-        let mut ilast: i32 = EMPTY;
+        let mut ilast: isize = EMPTY;
 
         for p in p1..p2 {
-            let i = a_i[p as usize];
+            let i = a_i[p as usize] as isize;
             debug3_print!("row: {}\n", i);
 
-            if i < 0 || i >= n_row {
+            if i < 0 || i >= n_row as isize {
                 // Row index out of range.
                 debug1_print!("index out of range, col {} row {}\n", j, i);
                 return Status::Invalid;
