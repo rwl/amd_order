@@ -8,7 +8,12 @@ pub fn info(info: &Info) {
     let nmultsubs_ldl = info.n_mult_subs_ldl;
     let nmultsubs_lu = info.n_mult_subs_lu;
     let lnz = info.lnz;
-    let lnzd = if n >= 0 && lnz >= 0 { n + lnz } else { -1 };
+    let lnzd = n + lnz;
+    // let lnzd = if n >= 0 && lnz >= 0 {
+    //     n + lnz
+    // } else {
+    //     0 /*-1*/
+    // };
 
     // AMD return status.
     print!("    status:                                             ");
@@ -91,19 +96,19 @@ pub fn info(info: &Info) {
 
     // Total flop counts for various factorizations.
 
-    if n >= 0 && ndiv >= 0 && nmultsubs_ldl >= 0 && nmultsubs_lu >= 0 {
-        print!(
-            "
+    // if n >= 0 && ndiv >= 0 && nmultsubs_ldl >= 0 && nmultsubs_lu >= 0 {
+    print!(
+        "
     chol flop count for real A, sqrt counted as 1 flop: {}
     LDL' flop count for real A:                         {}
     LDL' flop count for complex A:                      {}
     LU flop count for real A (with no pivoting):        {}
     LU flop count for complex A (with no pivoting):     {}\n\n",
-            n + ndiv + 2 * nmultsubs_ldl,
-            ndiv + 2 * nmultsubs_ldl,
-            9 * ndiv + 8 * nmultsubs_ldl,
-            ndiv + 2 * nmultsubs_lu,
-            9 * ndiv + 8 * nmultsubs_lu
-        );
-    }
+        n + ndiv + 2 * nmultsubs_ldl,
+        ndiv + 2 * nmultsubs_ldl,
+        9 * ndiv + 8 * nmultsubs_ldl,
+        ndiv + 2 * nmultsubs_lu,
+        9 * ndiv + 8 * nmultsubs_lu
+    );
+    // }
 }

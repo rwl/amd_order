@@ -6,10 +6,10 @@ pub struct Control {
 }
 
 pub fn default_control_settings() -> Control {
-    return Control {
+    Control {
         dense: 10.0,
         aggressive: true,
-    };
+    }
 }
 
 #[derive(Debug)]
@@ -17,33 +17,33 @@ pub struct Info {
     /// Return value of order and l_order.
     pub status: Status,
     /// A is n-by-n.
-    pub n: i32,
+    pub n: usize,
     /// Number of nonzeros in A.
-    pub nz: i32,
+    pub nz: usize,
     /// Symmetry of pattern (true is sym., false is unsym.)
     pub symmetry: bool,
     /// Number of entries on diagonal.
-    pub nz_diag: i32,
+    pub nz_diag: usize,
     /// nz in A+A'.
-    pub nz_a_plus_at: i32,
+    pub nz_a_plus_at: usize,
     /// Number of "dense" rows/columns in A.
-    pub n_dense: i32,
+    pub n_dense: usize,
     /// Number of garbage collections in AMD.
-    pub n_cmp_a: i32,
+    pub n_cmp_a: usize,
     /// Approx. nz in L, excluding the diagonal.
-    pub lnz: i32,
+    pub lnz: usize,
     /// Number of fl. point divides for LU and LDL'.
-    pub n_div: i32,
+    pub n_div: usize,
     /// Number of fl. point (*,-) pairs for LDL'.
-    pub n_mult_subs_ldl: i32,
+    pub n_mult_subs_ldl: usize,
     /// Number of fl. point (*,-) pairs for LU.
-    pub n_mult_subs_lu: i32,
+    pub n_mult_subs_lu: usize,
     /// Max nz. in any column of L, incl. diagonal.
-    pub d_max: i32,
+    pub d_max: usize,
 }
 
 impl Info {
-    pub fn new(n: i32) -> Info {
+    pub fn new(n: usize) -> Info {
         Info {
             status: Status::OK,
             n,

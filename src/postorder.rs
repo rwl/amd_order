@@ -1,17 +1,17 @@
 use crate::internal::*;
 use crate::post_tree::post_tree;
 
-pub fn postorder(nn: i32, parent: &[isize], nv: &[isize], f_size: &[isize]) -> Vec<isize> {
+pub fn postorder(nn: usize, parent: &[isize], nv: &[isize], f_size: &[isize]) -> Vec<isize> {
     // output
-    let mut order: Vec<isize> = vec![0; nn as usize];
+    let mut order: Vec<isize> = vec![0; nn];
 
     // local workspace
-    let mut child: Vec<isize> = vec![0; nn as usize];
-    let mut sibling: Vec<isize> = vec![0; nn as usize];
+    let mut child: Vec<isize> = vec![0; nn];
+    let mut sibling: Vec<isize> = vec![0; nn];
 
     for j in 0..nn {
-        child[j as usize] = EMPTY;
-        sibling[j as usize] = EMPTY;
+        child[j] = EMPTY;
+        sibling[j] = EMPTY;
     }
 
     // Place the children in link lists - bigger elements tend to be last.
@@ -37,30 +37,30 @@ pub fn postorder(nn: i32, parent: &[isize], nv: &[isize], f_size: &[isize]) -> V
 
         let mut nels = 0;
         for j in 0..nn {
-            if nv[j as usize] > 0 {
+            if nv[j] > 0 {
                 debug1_print!(
                     "{} :  nels {} npiv {} size {} parent {} maxfr {}\n",
                     j,
                     nels,
-                    nv[j as usize],
-                    f_size[j as usize],
-                    parent[j as usize],
-                    f_size[j as usize]
+                    nv[j],
+                    f_size[j],
+                    parent[j],
+                    f_size[j]
                 );
                 // This is an element. Dump the link list of children.
                 let mut nchild = 0;
                 debug1_print!("    Children:");
-                let mut ff = child[j as usize];
+                let mut ff = child[j];
                 while ff != EMPTY {
                     debug1_print!(" {}", ff);
-                    debug_assert!(parent[ff as usize] == j);
+                    debug_assert!(parent[ff as usize] == j as isize);
                     nchild += 1;
                     debug_assert!(nchild < nn);
 
                     ff = sibling[ff as usize];
                 }
                 debug1_println!();
-                let p = parent[j as usize];
+                let p = parent[j];
                 if p != EMPTY {
                     debug_assert!(nv[p as usize] > 0);
                 }
@@ -75,12 +75,12 @@ the biggest child last in each list:"
 
     // Place the largest child last in the list of children for each node.
     for i in 0..nn {
-        if nv[i as usize] > 0 && child[i as usize] != EMPTY {
+        if nv[i] > 0 && child[i] != EMPTY {
             let mut nchild = 0;
             {
                 debug1_print!("Before partial sort, element {}\n", i);
 
-                let mut f = child[i as usize];
+                let mut f = child[i];
                 while f != EMPTY {
                     debug_assert!(f >= 0 && f < nn as isize);
                     debug1_print!("      f: {}  size: {}\n", f, f_size[f as usize]);
@@ -97,7 +97,7 @@ the biggest child last in each list:"
             let mut bigfprev = EMPTY;
             let mut bigf = EMPTY;
 
-            let mut f = child[i as usize];
+            let mut f = child[i];
             while f != EMPTY {
                 debug_assert!(f >= 0 && f < nn as isize);
 
@@ -130,7 +130,7 @@ the biggest child last in each list:"
 
                 if bigfprev == EMPTY {
                     // Delete bigf from the element of the list.
-                    child[i as usize] = fnext;
+                    child[i] = fnext;
                 } else {
                     // Delete bigf from the middle of the list.
                     sibling[bigfprev as usize] = fnext;
@@ -139,7 +139,7 @@ the biggest child last in each list:"
                 // Put bigf at the end of the list.
                 sibling[bigf as usize] = EMPTY;
 
-                debug_assert!(child[i as usize] != EMPTY);
+                debug_assert!(child[i] != EMPTY);
                 debug_assert!(fprev != bigf);
                 debug_assert!(fprev != EMPTY);
 
@@ -148,7 +148,7 @@ the biggest child last in each list:"
 
             {
                 debug1_print!("After partial sort, element {}\n", i);
-                let mut f = child[i as usize];
+                let mut f = child[i];
                 while f != EMPTY {
                     debug_assert!(f >= 0 && f < nn as isize);
                     debug1_print!("        {}  {}\n", f, f_size[f as usize]);
@@ -164,12 +164,12 @@ the biggest child last in each list:"
 
     // Postorder the assembly tree.
     for i in 0..nn {
-        order[i as usize] = EMPTY;
+        order[i] = EMPTY;
     }
 
     let mut k = 0;
     for i in 0..nn {
-        if parent[i as usize] == EMPTY && nv[i as usize] > 0 {
+        if parent[i] == EMPTY && nv[i] > 0 {
             debug1_print!("Root of assembly tree {}\n", i);
             // k = post_tree(i, k, &mut child, sibling, &mut order, &mut stack, nn);
             k = post_tree(i, k, &mut child, &sibling, &mut order, nn);

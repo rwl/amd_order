@@ -1,16 +1,17 @@
 use crate::amd::*;
-use crate::internal::EMPTY;
+// #[cfg(feature = "debug1")]
+// use crate::internal::EMPTY;
 use crate::internal::*;
 use crate::valid::valid;
 
-pub fn aat(n: i32, a_p: &[i32], a_i: &[i32], info: &mut Info) -> (i32, Vec<i32>) {
-    let mut len: Vec<i32> = vec![0; n as usize]; // output
-    let mut t_p: Vec<i32> = vec![0; n as usize]; // local workspace
+pub fn aat(n: usize, a_p: &[usize], a_i: &[usize], info: &mut Info) -> (usize, Vec<usize>) {
+    let mut len: Vec<usize> = vec![0; n]; // output
+    let mut t_p: Vec<usize> = vec![0; n]; // local workspace
 
-    #[cfg(feature = "debug1")]
-    for k in 0..n {
-        t_p[k as usize] = EMPTY
-    }
+    // #[cfg(feature = "debug1")]
+    // for k in 0..n {
+    //     t_p[k as usize] = EMPTY
+    // }
     debug_assert!(valid(n, n, a_p, a_i) == Status::OK);
 
     // Clear the info array, if it exists.
@@ -26,30 +27,28 @@ pub fn aat(n: i32, a_p: &[i32], a_i: &[i32], info: &mut Info) -> (i32, Vec<i32>)
     info.status = Status::OK;
 
     for k in 0..n {
-        len[k as usize] = 0
+        len[k] = 0
     }
 
-    let mut nzdiag: i32 = 0;
-    let mut nzboth: i32 = 0;
-    let nz: i32 = a_p[n as usize];
+    let mut nzdiag: usize = 0;
+    let mut nzboth: usize = 0;
+    let nz: usize = a_p[n];
 
     for k in 0..n {
-        // let p: i32;
-        // let mut pj: i32;
-        let p1 = a_p[k as usize];
-        let p2 = a_p[k as usize + 1];
+        let p1 = a_p[k];
+        let p2 = a_p[k + 1];
         debug2_print!("\nAAT Column: {} p1: {} p2: {}\n", k, p1, p2);
 
         // Construct A+A'.
         let mut p = p1;
         while p < p2 {
             // Scan the upper triangular part of A.
-            let j = a_i[p as usize];
+            let j = a_i[p];
             if j < k {
                 // Entry A(j,k) is in the strictly upper triangular part,
                 // add both A(j,k) and A(k,j) to the matrix A+A'.
-                len[j as usize] += 1;
-                len[k as usize] += 1;
+                len[j] += 1;
+                len[k] += 1;
                 debug3_print!("    upper ({},{}) ({},{})\n", j, k, k, j);
                 p += 1;
             } else if j == k {
@@ -65,20 +64,19 @@ pub fn aat(n: i32, a_p: &[i32], a_i: &[i32], info: &mut Info) -> (i32, Vec<i32>)
 
             // Scan lower triangular part of A, in column j until reaching
             // row k. Start where last scan left off.
-            debug_assert!(t_p[j as usize] != EMPTY);
-            debug_assert!(
-                a_p[j as usize] <= t_p[j as usize] && t_p[j as usize] <= a_p[j as usize + 1]
-            );
+            // #[cfg(feature = "debug1")]
+            // debug_assert!(t_p[j as usize] != EMPTY);
+            debug_assert!(a_p[j] <= t_p[j] && t_p[j] <= a_p[j + 1]);
 
-            let pj2 = a_p[j as usize + 1];
-            let mut pj = t_p[j as usize];
+            let pj2 = a_p[j + 1];
+            let mut pj = t_p[j];
             while pj < pj2 {
-                let i = a_i[pj as usize];
+                let i = a_i[pj];
                 if i < k {
                     // A(i,j) is only in the lower part, not in upper.
                     // add both A(i,j) and A(j,i) to the matrix A+A'.
-                    len[i as usize] += 1;
-                    len[j as usize] += 1;
+                    len[i] += 1;
+                    len[j] += 1;
                     debug3_print!("    lower ({},{}) ({},{})\n", i, j, j, i);
                     pj += 1;
                 } else if i == k {
@@ -92,20 +90,20 @@ pub fn aat(n: i32, a_p: &[i32], a_i: &[i32], info: &mut Info) -> (i32, Vec<i32>)
                     break;
                 }
             }
-            t_p[j as usize] = pj;
+            t_p[j] = pj;
         }
         // Tp[k] points to the entry just below the diagonal in column k.
-        t_p[k as usize] = p;
+        t_p[k] = p;
     }
 
     // Clean up, for remaining mismatched entries.
     for j in 0..n {
-        for pj in t_p[j as usize]..a_p[j as usize + 1] {
-            let i = a_i[pj as usize];
+        for pj in t_p[j]..a_p[j + 1] {
+            let i = a_i[pj];
             // A(i,j) is only in the lower part, not in upper.
             // add both A(i,j) and A(j,i) to the matrix A+A'.
-            len[i as usize] += 1;
-            len[j as usize] += 1;
+            len[i] += 1;
+            len[j] += 1;
             debug3_print!("    lower cleanup ({},{}) ({},{})\n", i, j, j, i);
         }
     }
@@ -123,9 +121,9 @@ pub fn aat(n: i32, a_p: &[i32], a_i: &[i32], info: &mut Info) -> (i32, Vec<i32>)
         (2.0 * nzboth as f64) / (nz - nzdiag) as f64
     };
 
-    let mut nzaat: i32 = 0;
+    let mut nzaat: usize = 0;
     for k in 0..n {
-        nzaat += len[k as usize];
+        nzaat += len[k];
     }
 
     debug1_print!("AMD nz in A+A', excluding diagonal (nzaat) = {}\n", nzaat);

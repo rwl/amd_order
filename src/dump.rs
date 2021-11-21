@@ -3,29 +3,29 @@ use crate::internal::*;
 
 #[cfg(feature = "debug1")]
 pub fn dump(
-    n: i32,
-    pe: &[i32],
-    iw: &[i32],
-    len: &[i32],
-    iwlen: i32,
-    pfree: i32,
-    nv: &[i32],
-    next: &[i32],
-    last: &[i32],
-    head: &[i32],
-    e_len: &[i32],
-    degree: &[i32],
-    w: &[i32],
-    nel: i32,
+    n: usize,
+    pe: &[isize],
+    iw: &[isize],
+    len: &[usize],
+    iwlen: usize,
+    pfree: usize,
+    nv: &[isize],
+    next: &[isize],
+    last: &[isize],
+    head: &[isize],
+    e_len: &[isize],
+    degree: &[usize],
+    w: &[usize],
+    nel: isize,
 ) {
     debug_assert!(pfree <= iwlen);
     debug3_print!("\nAMD dump, pfree: {}\n", pfree);
     for i in 0..n {
-        let pei = pe[i as usize];
-        let elen = e_len[i as usize];
-        let nvi = nv[i as usize];
-        let leni = len[i as usize];
-        let wi = w[i as usize];
+        let pei = pe[i];
+        let elen = e_len[i];
+        let nvi = nv[i];
+        let leni = len[i];
+        let wi = w[i];
 
         if elen >= EMPTY {
             if nvi == 0 {
@@ -36,7 +36,7 @@ pub fn dump(
                     debug_assert!(wi == 1);
                 } else {
                     debug_assert!(pei < EMPTY);
-                    debug3_print!(" i {} -> parent {}\n", i, flip(pe[i as usize]));
+                    debug3_print!(" i {} -> parent {}\n", i, flip(pe[i]));
                 }
             } else {
                 debug3_print!("\nI {}: active principal supervariable:\n", i);
@@ -48,12 +48,12 @@ pub fn dump(
                 if elen == 0 {
                     debug3_print!(" : ");
                 }
-                debug_assert!(pei + leni <= pfree);
+                debug_assert!(pei as usize + leni <= pfree);
                 for k in 0..leni {
                     let j = iw[p as usize];
                     debug3_print!("  {}", j);
-                    debug_assert!(j >= 0 && j < n);
-                    if k == elen - 1 {
+                    debug_assert!(j >= 0 && j < n as isize);
+                    if k as isize == elen - 1 {
                         debug3_print!(" : ");
                     }
                     p += 1;
@@ -66,17 +66,17 @@ pub fn dump(
             if wi == 0 {
                 debug3_print!("\nE {}: absorbed element: w {}\n", e, wi);
                 debug_assert!(nvi > 0 && pei < 0);
-                debug3_print!(" e {} -> parent {}\n", e, flip(pe[e as usize]));
+                debug3_print!(" e {} -> parent {}\n", e, flip(pe[e]));
             } else {
                 debug3_print!("\nE {}: unabsorbed element: w {}\n", e, wi);
                 debug_assert!(nvi > 0 && pei >= 0);
                 let mut p = pei;
                 debug3_print!(" : ");
-                debug_assert!(pei + leni <= pfree);
+                debug_assert!(pei as usize + leni <= pfree);
                 for _k in 0..leni {
                     let j = iw[p as usize];
                     debug3_print!("  {}", j);
-                    debug_assert!(j >= 0 && j < n);
+                    debug_assert!(j >= 0 && j < n as isize);
                     p += 1;
                 }
                 debug3_println!();
@@ -87,14 +87,14 @@ pub fn dump(
     // This routine cannot be called when the hash buckets are non-empty.
     debug3_println!("\nDegree lists:");
     if nel >= 0 {
-        let mut cnt = 0;
+        let mut cnt: isize = 0;
         for deg in 0..n {
-            if head[deg as usize] == EMPTY {
+            if head[deg] == EMPTY {
                 continue;
             }
             let mut ilast = EMPTY;
             debug3_print!("{}: \n", deg);
-            let mut i = head[deg as usize];
+            let mut i = head[deg];
             while i != EMPTY {
                 debug3_print!(
                     "   {} : next {} last {} deg {}\n",
@@ -104,7 +104,10 @@ pub fn dump(
                     degree[i as usize]
                 );
                 debug_assert!(
-                    i >= 0 && i < n && ilast == last[i as usize] && deg == degree[i as usize]
+                    i >= 0
+                        && i < n as isize
+                        && ilast == last[i as usize]
+                        && deg == degree[i as usize]
                 );
                 cnt += nv[i as usize];
                 ilast = i;
@@ -113,25 +116,6 @@ pub fn dump(
             }
             debug3_print!("\n");
         }
-        debug_assert!(cnt == n - nel);
+        debug_assert!(cnt == n as isize - nel);
     }
 }
-
-// #[cfg(not(feature = "debug1"))]
-// pub fn dump(
-//     _n: i32,
-//     _pe: &[i32],
-//     _iw: &[i32],
-//     _len: &[i32],
-//     _iwlen: i32,
-//     _pfree: i32,
-//     _nv: &[i32],
-//     _next: &[i32],
-//     _last: &[i32],
-//     _head: &[i32],
-//     _e_len: &[i32],
-//     _degree: &[i32],
-//     _w: &[i32],
-//     _nel: i32,
-// ) {
-// }

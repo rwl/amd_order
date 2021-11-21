@@ -26,5 +26,5 @@ pub fn control(control: &Control) {
         println!("    aggressive absorption:  no");
     }
 
-    print!("    size of AMD integer: {}\n\n", size_of::<i32>());
+    print!("    size of AMD integer: {}\n\n", size_of::<isize>());
 }

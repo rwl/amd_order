@@ -23,26 +23,20 @@ use std::cmp::max;
 use valid::valid;
 
 pub fn order(
-    n: i32,
-    a_p: &[i32],
-    a_i: &[i32],
+    n: usize,
+    a_p: &[usize],
+    a_i: &[usize],
     control: &Control,
-) -> Result<(Vec<i32>, Vec<i32>, Info), Status> {
+) -> Result<(Vec<usize>, Vec<usize>, Info), Status> {
     let mut info = Info::new(n);
 
-    if n < 0 {
-        return Err(Status::Invalid);
-    }
     if n == 0 {
         let p = Vec::new();
         let p_inv = Vec::new();
         return Ok((p, p_inv, info));
     }
-    let nz: i32 = a_p[n as usize];
+    let nz: usize = a_p[n];
     info.nz = nz;
-    if nz < 0 {
-        return Err(Status::Invalid);
-    }
 
     // Check the input matrix.
     let status = valid(n, n, a_p, a_i);
@@ -68,9 +62,9 @@ pub fn order(
     debug1_print!("iwlen {}\n", iwlen);
 
     // Order the matrix.
-    let (p, p_inv) = amd_1(n, &c_p, &c_i, &mut len, iwlen, &control, &mut info);
+    let (p, p_inv) = amd_1(n, &c_p, &c_i, &mut len, iwlen, control, &mut info);
 
     info.status = status;
 
-    return Ok((p, p_inv, info));
+    Ok((p, p_inv, info))
 }

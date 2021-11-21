@@ -1,14 +1,14 @@
 use crate::internal::*;
 
 pub fn post_tree(
-    root: i32,
-    mut k: i32,
+    root: usize,
+    mut k: usize,
     child: &mut [isize], // input of size nn, undefined on output
     sibling: &[isize],   // input of size nn, not modified
     order: &mut [isize], // output of size nn
-    nn: i32,
-) -> i32 {
-    let mut stack: Vec<isize> = vec![0; nn as usize];
+    nn: usize,
+) -> usize {
+    let mut stack: Vec<isize> = vec![0; nn];
 
     /*if false {
         // Recursive version (stack[] is not used):
@@ -27,12 +27,12 @@ pub fn post_tree(
     // Non-recursive version, using an explicit stack.
 
     // Push root on the stack.
-    let mut head = 0;
+    let mut head: isize = 0;
     stack[0] = root as isize;
 
     while head >= 0 {
         // Get head of stack.
-        debug_assert!(head < nn);
+        debug_assert!((head as usize) < nn);
         let i = stack[head as usize];
         debug1_print!("head of stack {} \n", i);
         debug_assert!(i >= 0 && i < nn as isize);
@@ -45,12 +45,12 @@ pub fn post_tree(
             let mut f = child[i as usize];
             while f != EMPTY {
                 head += 1;
-                debug_assert!(head < nn);
+                debug_assert!((head as usize) < nn);
                 debug_assert!(f >= 0 && f < nn as isize);
                 f = sibling[f as usize];
             }
             let mut h = head;
-            debug_assert!(head < nn);
+            debug_assert!((head as usize) < nn);
             let mut f = child[i as usize];
             while f != EMPTY {
                 debug_assert!(h > 0);
@@ -82,13 +82,13 @@ pub fn post_tree(
             while h >= 0 {
                 let j = stack[h as usize];
                 debug1_print!(" {}", j);
-                debug_assert!(j >= 0 && j < nn);
+                debug_assert!(j >= 0 && j < nn as isize);
                 h -= 1;
             }
             debug1_print!("\n\n");
-            debug_assert!(head < nn);
+            debug_assert!(head < nn as isize);
         }
     }
 
-    return k;
+    k
 }
