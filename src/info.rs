@@ -28,87 +28,88 @@ pub fn info(info: &Info) {
     }
 
     // Statistics about the input matrix.
-    print!(
-        "    n, dimension of A:                                  {}\n",
+    println!(
+        "    n, dimension of A:                                  {}",
         n
     );
-    print!(
-        "    nz, number of nonzeros in A:                        {}\n",
+    println!(
+        "    nz, number of nonzeros in A:                        {}",
         info.nz
     );
-    print!(
-        "    symmetry of A:                                      {}\n",
+    println!(
+        "    symmetry of A:                                      {}",
         info.symmetry
     );
-    print!(
-        "    number of nonzeros on diagonal:                     {}\n",
+    println!(
+        "    number of nonzeros on diagonal:                     {}",
         info.nz_diag
     );
-    print!(
-        "    nonzeros in pattern of A+A' (excl. diagonal):       {}\n",
+    println!(
+        "    nonzeros in pattern of A+A' (excl. diagonal):       {}",
         info.nz_a_plus_at
     );
-    print!(
-        "    # dense rows/columns of A+A':                       {}\n",
+    println!(
+        "    # dense rows/columns of A+A':                       {}",
         info.n_dense
     );
 
     // Statistics about AMD's behavior.
-    // print!("    memory used, in bytes:                              {}\n", info.memory);
-    print!(
-        "    # of memory compactions:                            {}\n",
+    // println!("    memory used, in bytes:                              {}", info.memory);
+    println!(
+        "    # of memory compactions:                            {}",
         info.n_cmp_a
     );
 
     // Statistics about the ordering quality.
-    print!(
+    println!(
         "
     The following approximate statistics are for a subsequent
     factorization of A(P,P) + A(P,P)'.  They are slight upper
     bounds if there are no dense rows/columns in A+A', and become
-    looser if dense rows/columns exist.\n\n"
+    looser if dense rows/columns exist.\n"
     );
 
-    print!(
-        "    nonzeros in L (excluding diagonal):                 {}\n",
+    println!(
+        "    nonzeros in L (excluding diagonal):                 {}",
         lnz
     );
-    print!(
-        "    nonzeros in L (including diagonal):                 {}\n",
+    println!(
+        "    nonzeros in L (including diagonal):                 {}",
         lnzd
     );
-    print!(
-        "    # divide operations for LDL' or LU:                 {}\n",
+    println!(
+        "    # divide operations for LDL' or LU:                 {}",
         ndiv
     );
-    print!(
-        "    # multiply-subtract operations for LDL':            {}\n",
+    println!(
+        "    # multiply-subtract operations for LDL':            {}",
         nmultsubs_ldl
     );
-    print!(
-        "    # multiply-subtract operations for LU:              {}\n",
+    println!(
+        "    # multiply-subtract operations for LU:              {}",
         nmultsubs_lu
     );
-    print!(
-        "    max nz. in any column of L (incl. diagonal):        {}\n",
+    println!(
+        "    max nz. in any column of L (incl. diagonal):        {}",
         info.d_max
     );
 
     // Total flop counts for various factorizations.
 
     // if n >= 0 && ndiv >= 0 && nmultsubs_ldl >= 0 && nmultsubs_lu >= 0 {
-    print!(
+    println!(
         "
     chol flop count for real A, sqrt counted as 1 flop: {}
     LDL' flop count for real A:                         {}
     LDL' flop count for complex A:                      {}
     LU flop count for real A (with no pivoting):        {}
-    LU flop count for complex A (with no pivoting):     {}\n\n",
+    LU flop count for complex A (with no pivoting):     {}",
         n + ndiv + 2 * nmultsubs_ldl,
         ndiv + 2 * nmultsubs_ldl,
         9 * ndiv + 8 * nmultsubs_ldl,
         ndiv + 2 * nmultsubs_lu,
         9 * ndiv + 8 * nmultsubs_lu
     );
+    println!();
     // }
 }

@@ -15,7 +15,7 @@ fn main() {
     ];
     let control = default_control_settings();
 
-    let (p, p_inv, _info) = order(n, &a_p, &a_i, &control).unwrap();
+    let (p, p_inv, info) = order(n, &a_p, &a_i, &control).unwrap();
 
     println!("P = {:?}", p);
     // Output:

@@ -50,21 +50,21 @@ fn main() {
     let control = default_control_settings();
     let mut a = [[""; 24]; 24];
 
-    print!("AMD demo, with a jumbled version of the 24-by-24\n");
-    print!("Harwell/Boeing matrix, can_24:\n");
+    println!("AMD demo, with a jumbled version of the 24-by-24");
+    println!("Harwell/Boeing matrix, can_24:");
 
     amd_order::control::control(&control);
 
     // Print the input matrix.
     let nz = a_p[n];
-    print!(
+    println!(
         "\nJumbled input matrix:  {}-by-{}, with {} entries.
     Note that for a symmetric matrix such as this one, only the
     strictly lower or upper triangular parts would need to be
     passed to AMD, since AMD computes the ordering of A+A'.  The
     diagonal entries are also not needed, since AMD ignores them.
     This version of the matrix has jumbled columns and duplicate
-    row indices.\n",
+    row indices.",
         n, n, nz
     );
     for j in 0..n {
@@ -81,12 +81,12 @@ fn main() {
             let i = a_i[pj as usize];
             print!(" {}", i);
         }
-        print!("\n");
+        println!();
     }
 
     // Print a character plot of the input matrix. This is only reasonable
     // because the matrix is small.
-    print!("\nPlot of (jumbled) input matrix pattern:\n");
+    println!("\nPlot of (jumbled) input matrix pattern:");
     for j in 0..n {
         for i in 0..n {
             a[i][j] = ".";
@@ -100,17 +100,17 @@ fn main() {
     for j in 0..n {
         print!(" {}", j % 10);
     }
-    print!("\n");
+    println!();
     for i in 0..n {
         print!("{}: ", i);
         for j in 0..n {
             print!(" {}", a[i][j]);
         }
-        print!("\n");
+        println!();
     }
 
     // Print a character plot of the matrix A+A'.
-    print!("\nPlot of symmetric matrix to be ordered by amd_order:\n");
+    println!("\nPlot of symmetric matrix to be ordered by amd_order:");
     for j in 0..n {
         for i in 0..n {
             a[i][j] = ".";
@@ -128,19 +128,19 @@ fn main() {
     for j in 0..n {
         print!(" {}", j % 10);
     }
-    print!("\n");
+    println!();
     for i in 0..n {
         print!("{}: ", i);
         for j in 0..n {
             print!(" {}", a[i][j]);
         }
-        print!("\n");
+        println!();
     }
 
     // Order the matrix.
     let (p, _p_inv, info) = order(n, &a_p, &a_i, &control).unwrap();
-    print!(
-        "return value from amd_order: {:?} (should be {:?})\n",
+    println!(
+        "return value from amd_order: {:?} (should be {:?})",
         info.status,
         Status::OkButJumbled
     );
@@ -149,29 +149,31 @@ fn main() {
     amd_order::info::info(&info);
 
     if info.status != Status::OkButJumbled {
-        print!("AMD failed\n");
+        println!("AMD failed");
         return;
     }
 
     // Print the permutation vector, P, and compute the inverse permutation.
-    print!("Permutation vector:\n");
+    println!("Permutation vector:");
     for k in 0..n {
         // Row/column j is the kth row/column in the permuted matrix.
         let j = p[k];
         p_inv[j as usize] = k as i32;
         print!(" {}", j);
     }
-    print!("\n\n");
+    println!();
+    println!();
 
-    print!("Inverse permutation vector:\n");
+    println!("Inverse permutation vector:");
     for j in 0..n {
         let k = p_inv[j];
         print!(" {}", k);
     }
-    print!("\n\n");
+    println!();
+    println!();
 
     // Print a character plot of the permuted matrix.
-    print!("\nPlot of (symmetrized) permuted matrix pattern:\n");
+    println!("\nPlot of (symmetrized) permuted matrix pattern:");
     for j in 0..n {
         for i in 0..n {
             a[i][j] = ".";
@@ -191,12 +193,12 @@ fn main() {
     for j in 0..n {
         print!(" {}", j % 10);
     }
-    print!("\n");
+    println!();
     for i in 0..n {
         print!("{}: ", i);
         for j in 0..n {
             print!(" {}", a[i][j]);
         }
-        print!("\n");
+        println!();
     }
 }
