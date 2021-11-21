@@ -677,7 +677,7 @@ pub fn amd_2(
                 // standard does not define a % b when a and/or b are negative.
                 // That's why hash is defined as an unsigned int, to avoid this
                 // problem.
-                hash = hash % n as u32;
+                hash %= n as u32;
                 debug_assert!(/*hash >= 0 &&*/ hash < n as u32);
 
                 // If the Hhead array is not used:
