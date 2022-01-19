@@ -1,7 +1,7 @@
 extern crate amd_order;
 
-use amd_order::amd::{default_control_settings, Status};
 use amd_order::order;
+use amd_order::{default_control_settings, Status};
 
 // A simple test that illustrates the use of the interface to AMD.
 fn main() {
@@ -48,7 +48,7 @@ fn main() {
 
     println!("AMD demo, with the 24-by-24 Harwell/Boeing matrix, can_24:");
 
-    amd_order::control::control(&control);
+    amd_order::control(&control);
 
     // Print the input matrix.
     let nz = a_p[n];
@@ -112,7 +112,7 @@ fn main() {
     );
 
     // Print the statistics.
-    amd_order::info::info(&info);
+    amd_order::info(&info);
 
     if info.status != Status::OK {
         println!("AMD failed");

@@ -4,12 +4,12 @@
 extern crate num_traits;
 
 mod aat;
-pub mod amd;
+mod amd;
 mod amd_1;
 mod amd_2;
-pub mod control;
+mod control;
 mod dump;
-pub mod info;
+mod info;
 mod internal;
 mod post_tree;
 mod postorder;
@@ -19,8 +19,10 @@ mod valid;
 use num_traits::{NumAssignOps, PrimInt};
 
 use aat::aat;
-use amd::*;
+pub use amd::*;
 use amd_1::amd_1;
+pub use control::control;
+pub use info::info;
 use internal::*;
 use preprocess::preprocess;
 use std::cmp::max;

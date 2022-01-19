@@ -1,6 +1,6 @@
 extern crate amd_order;
 
-use amd_order::amd::default_control_settings;
+use amd_order::default_control_settings;
 use amd_order::order;
 
 fn main() {
@@ -25,5 +25,5 @@ fn main() {
     // Output:
     //   PInv = [0, 4, 2, 1, 3]
 
-    amd_order::info::info(&info);
+    amd_order::info(&info);
 }
