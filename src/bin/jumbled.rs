@@ -14,12 +14,12 @@ fn main() {
     // There are many duplicate entries, which must be removed. */
     let n: usize = 24;
 
-    let a_p: Vec<usize> = vec![
+    let a_p = vec![
         0, 9, 14, 20, 28, 33, 37, 44, 53, 58, 63, 63, 66, 69, 72, 75, 78, 82, 86, 91, 97, 101, 112,
         112, 116,
     ];
 
-    let a_i: Vec<usize> = vec![
+    let a_i = vec![
         0, 17, 18, 21, 5, 12, 5, 0, 13, // column: 0
         14, 1, 8, 13, 17, // column: 1
         2, 20, 11, 6, 11, 22, // column: 2

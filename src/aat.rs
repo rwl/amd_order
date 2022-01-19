@@ -4,9 +4,18 @@ use crate::amd::*;
 use crate::internal::*;
 use crate::valid::valid;
 
-pub fn aat(n: usize, a_p: &[usize], a_i: &[usize], info: &mut Info) -> (usize, Vec<usize>) {
-    let mut len: Vec<usize> = vec![0; n]; // output
-    let mut t_p: Vec<usize> = vec![0; n]; // local workspace
+use num_traits::{NumAssignOps, PrimInt};
+
+pub fn aat<I: PrimInt + NumAssignOps>(
+    n: I,
+    a_p: &[I],
+    a_i: &[I],
+    info: &mut Info,
+) -> (usize, Vec<usize>) {
+    let un = n.to_usize().unwrap();
+
+    let mut len: Vec<usize> = vec![0; un]; // output
+    let mut t_p: Vec<usize> = vec![0; un]; // local workspace
 
     // #[cfg(feature = "debug1")]
     // for k in 0..n {
@@ -26,24 +35,24 @@ pub fn aat(n: usize, a_p: &[usize], a_i: &[usize], info: &mut Info) -> (usize, V
     // }
     info.status = Status::OK;
 
-    for k in 0..n {
-        len[k] = 0
+    for k in 0..un {
+        len[k] = 0;
     }
 
     let mut nzdiag: usize = 0;
     let mut nzboth: usize = 0;
-    let nz: usize = a_p[n];
+    let nz = a_p[un].to_usize().unwrap();
 
-    for k in 0..n {
-        let p1 = a_p[k];
-        let p2 = a_p[k + 1];
+    for k in 0..un {
+        let p1 = a_p[k].to_usize().unwrap();
+        let p2 = a_p[k + 1].to_usize().unwrap();
         debug2_print!("\nAAT Column: {} p1: {} p2: {}\n", k, p1, p2);
 
         // Construct A+A'.
         let mut p = p1;
         while p < p2 {
             // Scan the upper triangular part of A.
-            let j = a_i[p];
+            let j = a_i[p].to_usize().unwrap();
             if j < k {
                 // Entry A(j,k) is in the strictly upper triangular part,
                 // add both A(j,k) and A(k,j) to the matrix A+A'.
@@ -66,12 +75,14 @@ pub fn aat(n: usize, a_p: &[usize], a_i: &[usize], info: &mut Info) -> (usize, V
             // row k. Start where last scan left off.
             // #[cfg(feature = "debug1")]
             // debug_assert!(t_p[j as usize] != EMPTY);
-            debug_assert!(a_p[j] <= t_p[j] && t_p[j] <= a_p[j + 1]);
+            debug_assert!(
+                a_p[j].to_usize().unwrap() <= t_p[j] && t_p[j] <= a_p[j + 1].to_usize().unwrap()
+            );
 
-            let pj2 = a_p[j + 1];
+            let pj2 = a_p[j + 1].to_usize().unwrap();
             let mut pj = t_p[j];
             while pj < pj2 {
-                let i = a_i[pj];
+                let i = a_i[pj].to_usize().unwrap();
                 if i < k {
                     // A(i,j) is only in the lower part, not in upper.
                     // add both A(i,j) and A(j,i) to the matrix A+A'.
@@ -97,9 +108,9 @@ pub fn aat(n: usize, a_p: &[usize], a_i: &[usize], info: &mut Info) -> (usize, V
     }
 
     // Clean up, for remaining mismatched entries.
-    for j in 0..n {
-        for pj in t_p[j]..a_p[j + 1] {
-            let i = a_i[pj];
+    for j in 0..un {
+        for pj in t_p[j]..a_p[j + 1].to_usize().unwrap() {
+            let i = a_i[pj].to_usize().unwrap();
             // A(i,j) is only in the lower part, not in upper.
             // add both A(i,j) and A(j,i) to the matrix A+A'.
             len[i] += 1;
@@ -122,7 +133,7 @@ pub fn aat(n: usize, a_p: &[usize], a_i: &[usize], info: &mut Info) -> (usize, V
     };
 
     let mut nzaat: usize = 0;
-    for k in 0..n {
+    for k in 0..un {
         nzaat += len[k];
     }
 
@@ -136,7 +147,7 @@ pub fn aat(n: usize, a_p: &[usize], a_i: &[usize], info: &mut Info) -> (usize, V
     );
 
     info.status = Status::OK;
-    info.n = n;
+    info.n = un;
     info.nz = nz;
     info.symmetry = sym != 0.0; // Symmetry of pattern of A.
     info.nz_diag = nzdiag; // Nonzeros on diagonal of A.

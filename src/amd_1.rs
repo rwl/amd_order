@@ -2,23 +2,27 @@ use crate::amd::*;
 use crate::amd_2::amd_2;
 use crate::internal::*;
 use crate::valid::valid;
+use num_traits::PrimInt;
+use std::fmt::Display;
 
-pub fn amd_1(
-    n: usize,
-    a_p: &[usize],
-    a_i: &[usize],
+pub fn amd_1<I: PrimInt + Display>(
+    n: I,
+    a_p: &[I],
+    a_i: &[I],
     mut len: &mut [usize],
     iwlen: usize,
     control: &Control,
     mut info: &mut Info,
-) -> (Vec<usize>, Vec<usize>) {
+) -> (Vec<I>, Vec<I>) {
+    let un = n.to_usize().unwrap();
+
     // Construct the matrix for amd_2.
 
-    debug_assert!(n > 0);
+    debug_assert!(un > 0);
 
-    let mut p_e: Vec<isize> = vec![0; n];
-    let mut s_p: Vec<usize> = vec![0; n];
-    let mut t_p: Vec<usize> = vec![0; n];
+    let mut p_e: Vec<isize> = vec![0; un];
+    let mut s_p: Vec<usize> = vec![0; un];
+    let mut t_p: Vec<usize> = vec![0; un];
     let mut i_w: Vec<isize> = vec![0; iwlen];
 
     debug_assert!(valid(n, n, a_p, a_i) == Status::OK);
@@ -26,7 +30,7 @@ pub fn amd_1(
     // Construct the pointers for A+A'.
 
     let mut pfree: usize = 0;
-    for j in 0..n {
+    for j in 0..un {
         p_e[j] = pfree as isize;
         s_p[j] = pfree;
         pfree += len[j];
@@ -36,34 +40,34 @@ pub fn amd_1(
     // what is strictly required in amd_2. amd_2 can operate with no elbow
     // room at all, but it will be very slow. For better performance, at
     // least size-n elbow room is enforced.
-    debug_assert!(iwlen >= pfree + n);
+    debug_assert!(iwlen >= pfree + un);
 
     #[cfg(feature = "debug1")]
     for p in 0..iwlen {
         i_w[p] = EMPTY;
     }
 
-    for k in 0..n {
+    for k in 0..un {
         debug1_print!("Construct row/column k = {} of A+A'\n", k);
-        let p1 = a_p[k];
-        let p2 = a_p[k + 1];
+        let p1 = a_p[k].to_usize().unwrap();
+        let p2 = a_p[k + 1].to_usize().unwrap();
 
         // Construct A+A'.
         let mut p = p1;
         while p < p2 {
             // Scan the upper triangular part of A.
-            let j = a_i[p];
-            debug_assert!(/*j >= 0 &&*/ j < n);
+            let j = a_i[p].to_usize().unwrap();
+            debug_assert!(/*j >= 0 &&*/ j < un);
             if j < k {
                 // Entry A(j,k) in the strictly upper triangular part.
                 #[cfg(feature = "debug1")]
-                if j == (n - 1) {
+                if j == (un - 1) {
                     debug_assert!(s_p[j] < pfree);
                 } else {
                     debug_assert!((s_p[j] as isize) < p_e[j + 1]);
                 }
                 #[cfg(feature = "debug1")]
-                if k == (n - 1) {
+                if k == (un - 1) {
                     debug_assert!(s_p[k] < pfree);
                 } else {
                     debug_assert!((s_p[k] as isize) < p_e[k + 1]);
@@ -88,22 +92,24 @@ pub fn amd_1(
 
             // Scan lower triangular part of A, in column j until reaching
             // row k. Start where last scan left off.
-            debug_assert!(a_p[j] <= t_p[j] && t_p[j] <= a_p[j + 1]);
+            debug_assert!(
+                a_p[j].to_usize().unwrap() <= t_p[j] && t_p[j] <= a_p[j + 1].to_usize().unwrap()
+            );
             let mut pj = t_p[j];
-            let pj2 = a_p[j + 1];
+            let pj2 = a_p[j + 1].to_usize().unwrap();
             while pj < pj2 {
-                let i = a_i[pj];
-                debug_assert!(/*i >= 0 &&*/ i < n);
+                let i = a_i[pj].to_usize().unwrap();
+                debug_assert!(/*i >= 0 &&*/ i < un);
                 if i < k {
                     // A (i,j) is only in the lower part, not in upper.
                     #[cfg(feature = "debug1")]
-                    if i == n - 1 {
+                    if i == un - 1 {
                         debug_assert!(s_p[i] < pfree);
                     } else {
                         debug_assert!((s_p[i] as isize) < p_e[i + 1]);
                     }
                     #[cfg(feature = "debug1")]
-                    if j == n - 1 {
+                    if j == un - 1 {
                         debug_assert!(s_p[j] < pfree);
                     } else {
                         debug_assert!((s_p[j] as isize) < p_e[j + 1]);
@@ -132,20 +138,21 @@ pub fn amd_1(
     }
 
     // Clean up, for remaining mismatched entries.
-    for j in 0..n {
-        for pj in t_p[j]..a_p[j + 1] {
-            let i = a_i[pj];
+    for j in 0..un {
+        let p2 = a_p[j + 1].to_usize().unwrap();
+        for pj in t_p[j]..p2 {
+            let i = a_i[pj].to_usize().unwrap();
 
-            debug_assert!(/*i >= 0 &&*/ i < n);
+            debug_assert!(/*i >= 0 &&*/ i < un);
             // A(i,j) is only in the lower part, not in upper.
             #[cfg(feature = "debug1")]
-            if i == n - 1 {
+            if i == un - 1 {
                 debug_assert!(s_p[i] < pfree);
             } else {
                 debug_assert!((s_p[i] as isize) < p_e[i + 1]);
             }
             #[cfg(feature = "debug1")]
-            if j == n - 1 {
+            if j == un - 1 {
                 debug_assert!(s_p[j] < pfree);
             } else {
                 debug_assert!((s_p[j] as isize) < p_e[j + 1]);
@@ -160,15 +167,15 @@ pub fn amd_1(
     }
 
     #[cfg(feature = "debug1")]
-    for j in 0..n - 1 {
+    for j in 0..un - 1 {
         debug_assert!((s_p[j] as isize) == p_e[j + 1])
     }
-    debug_assert!(s_p[n - 1] == pfree);
+    debug_assert!(s_p[un - 1] == pfree);
 
     // Tp and Sp no longer needed.
 
     // Order the matrix.
-    let (_nv, p_inv, p, _e_len) = amd_2(
+    let (_nv, p_inv, p, _e_len) = amd_2::<I>(
         n, &mut p_e, &mut i_w, &mut len, iwlen, pfree, control, &mut info,
     );
 

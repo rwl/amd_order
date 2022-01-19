@@ -1,6 +1,8 @@
 /// Copyright (c) 1996-2015 Timothy A. Davis, Patrick R. Amestoy and Iain S. Duff.
 /// Copyright (c) 2011-2021 Richard Lincoln.
 /// All Rights Reserved.
+extern crate num_traits;
+
 mod aat;
 pub mod amd;
 mod amd_1;
@@ -14,28 +16,33 @@ mod postorder;
 mod preprocess;
 mod valid;
 
+use num_traits::{NumAssignOps, PrimInt};
+
 use aat::aat;
 use amd::*;
 use amd_1::amd_1;
 use internal::*;
 use preprocess::preprocess;
 use std::cmp::max;
+use std::fmt::Display;
 use valid::valid;
 
-pub fn order(
-    n: usize,
-    a_p: &[usize],
-    a_i: &[usize],
+pub fn order<I: PrimInt + NumAssignOps + Display>(
+    n: I,
+    a_p: &[I],
+    a_i: &[I],
     control: &Control,
-) -> Result<(Vec<usize>, Vec<usize>, Info), Status> {
-    let mut info = Info::new(n);
+) -> Result<(Vec<I>, Vec<I>, Info), Status> {
+    let un = n.to_usize().unwrap();
 
-    if n == 0 {
+    let mut info = Info::new(un);
+
+    if n == I::zero() {
         let p = Vec::new();
         let p_inv = Vec::new();
         return Ok((p, p_inv, info));
     }
-    let nz: usize = a_p[n];
+    let nz = a_p[un].to_usize().unwrap();
     info.nz = nz;
 
     // Check the input matrix.
@@ -56,9 +63,9 @@ pub fn order(
     // Determine the symmetry and count off-diagonal nonzeros in A+A'.
     let (nzaat, mut len) = aat(n, &c_p, &c_i, &mut info);
     debug1_print!("nzaat: {}\n", nzaat);
-    debug_assert!((max(nz - n, 0) <= nzaat) && (nzaat <= 2 * nz));
+    debug_assert!((max(nz - un, 0) <= nzaat) && (nzaat <= 2 * nz));
 
-    let iwlen = nzaat + (nzaat / 5) + n; // Space for matrix + elbow room.
+    let iwlen = nzaat + (nzaat / 5) + un; // Space for matrix + elbow room.
     debug1_print!("iwlen {}\n", iwlen);
 
     // Order the matrix.

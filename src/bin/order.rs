@@ -10,12 +10,12 @@ fn main() {
     // 0-based, with row and column indices in the range 0 to n-1.
     let n: usize = 24;
 
-    let a_p: Vec<usize> = vec![
+    let a_p = vec![
         0, 9, 15, 21, 27, 33, 39, 48, 57, 61, 70, 76, 82, 88, 94, 100, 106, 110, 119, 128, 137,
         143, 152, 156, 160,
     ];
 
-    let a_i: Vec<usize> = vec![
+    let a_i = vec![
         0, 5, 6, 12, 13, 17, 18, 19, 21, // column 0
         1, 8, 9, 13, 14, 17, // column 1
         2, 6, 11, 20, 21, 22, // column 2

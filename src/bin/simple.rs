@@ -4,9 +4,9 @@ use amd_order::amd::default_control_settings;
 use amd_order::order;
 
 fn main() {
-    let n: usize = 5;
-    let a_p: Vec<usize> = vec![0, 2, 6, 10, 12, 14];
-    let a_i: Vec<usize> = vec![
+    let n = 5;
+    let a_p = vec![0, 2, 6, 10, 12, 14];
+    let a_i = vec![
         0, 1, // 1st column
         0, 1, 2, 4, // 2nd column
         1, 2, 3, 4, // 3rd column
@@ -15,7 +15,7 @@ fn main() {
     ];
     let control = default_control_settings();
 
-    let (p, p_inv, info) = order(n, &a_p, &a_i, &control).unwrap();
+    let (p, p_inv, info) = order::<i32>(n, &a_p, &a_i, &control).unwrap();
 
     println!("P = {:?}", p);
     // Output:
