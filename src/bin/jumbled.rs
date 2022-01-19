@@ -1,7 +1,4 @@
-extern crate amd_order;
-
-use amd_order::order;
-use amd_order::{default_control_settings, Status};
+extern crate amd;
 
 // A simple test that illustrates the use of the interface to AMD.
 //
@@ -47,13 +44,13 @@ fn main() {
     ];
 
     let mut p_inv = vec![0; 24];
-    let control = default_control_settings();
+    let control = amd::default_control_settings();
     let mut a = [[""; 24]; 24];
 
     println!("AMD demo, with a jumbled version of the 24-by-24");
     println!("Harwell/Boeing matrix, can_24:");
 
-    amd_order::control(&control);
+    amd::control(&control);
 
     // Print the input matrix.
     let nz = a_p[n];
@@ -110,7 +107,7 @@ fn main() {
     }
 
     // Print a character plot of the matrix A+A'.
-    println!("\nPlot of symmetric matrix to be ordered by amd_order:");
+    println!("\nPlot of symmetric matrix to be ordered by amd::order:");
     for j in 0..n {
         for i in 0..n {
             a[i][j] = ".";
@@ -138,17 +135,17 @@ fn main() {
     }
 
     // Order the matrix.
-    let (p, _p_inv, info) = order(n, &a_p, &a_i, &control).unwrap();
+    let (p, _p_inv, info) = amd::order(n, &a_p, &a_i, &control).unwrap();
     println!(
-        "return value from amd_order: {:?} (should be {:?})",
+        "return value from amd::order: {:?} (should be {:?})",
         info.status,
-        Status::OkButJumbled
+        amd::Status::OkButJumbled
     );
 
     // Print the statistics.
-    amd_order::info(&info);
+    amd::info(&info);
 
-    if info.status != Status::OkButJumbled {
+    if info.status != amd::Status::OkButJumbled {
         println!("AMD failed");
         return;
     }

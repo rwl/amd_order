@@ -1,5 +1,5 @@
 [package]
-name = "amd_order"
+name = "amd"
 version = "0.1.0"
 authors = ["Richard Lincoln <r.w.lincoln@gmail.com>"]
 edition = "2018"

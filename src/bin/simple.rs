@@ -1,7 +1,4 @@
-extern crate amd_order;
-
-use amd_order::default_control_settings;
-use amd_order::order;
+extern crate amd;
 
 fn main() {
     let n = 5;
@@ -13,9 +10,9 @@ fn main() {
         2, 3, // 4th column
         1, 4, // 5th column
     ];
-    let control = default_control_settings();
+    let control = amd::default_control_settings();
 
-    let (p, p_inv, info) = order::<i32>(n, &a_p, &a_i, &control).unwrap();
+    let (p, p_inv, info) = amd::order::<i32>(n, &a_p, &a_i, &control).unwrap();
 
     println!("P = {:?}", p);
     // Output:
@@ -25,5 +22,5 @@ fn main() {
     // Output:
     //   PInv = [0, 4, 2, 1, 3]
 
-    amd_order::info(&info);
+    amd::info(&info);
 }
