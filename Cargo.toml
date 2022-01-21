@@ -1,8 +1,12 @@
 [package]
 name = "amd"
 version = "0.1.0"
-authors = ["Richard Lincoln <r.w.lincoln@gmail.com>"]
 edition = "2018"
+description = "Approximate Minimum Degree ordering"
+repository = "https://github.com/rwl/amd_order/"
+license = "BSD-3-Clause"
+categories = ["algorithms", "mathematics", "science"]
+default-run = "simple"
 
 [dependencies]
 num-traits = "0.2"
