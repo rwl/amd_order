@@ -44,7 +44,7 @@ fn main() {
     ];
 
     let mut p_inv = vec![0; 24];
-    let control = amd::default_control_settings();
+    let control = amd::Control::default();
     let mut a = [[""; 24]; 24];
 
     println!("AMD demo, with a jumbled version of the 24-by-24");

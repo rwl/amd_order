@@ -1,3 +1,4 @@
+#[derive(Debug, Clone)]
 pub struct Control {
     /// "dense" if degree > dense * sqrt(n)
     pub dense: f64,
@@ -5,14 +6,13 @@ pub struct Control {
     pub aggressive: bool,
 }
 
-pub fn default_control_settings() -> Control {
-    Control {
-        dense: 10.0,
-        aggressive: true,
+impl Default for Control {
+    fn default() -> Self {
+        Self{ dense: 10.0, aggressive: true }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Info {
     /// Return value of order and l_order.
     pub status: Status,
@@ -62,7 +62,7 @@ impl Info {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Status {
     OK,
     /// Input arguments are not valid.

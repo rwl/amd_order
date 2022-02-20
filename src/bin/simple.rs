@@ -10,7 +10,7 @@ fn main() {
         2, 3, // 4th column
         1, 4, // 5th column
     ];
-    let control = amd::default_control_settings();
+    let control = amd::Control::default();
 
     let (p, p_inv, info) = amd::order::<i32>(n, &a_p, &a_i, &control).unwrap();
 
