@@ -19,7 +19,7 @@ mod valid;
 use num_traits::{NumAssignOps, PrimInt};
 
 use aat::aat;
-pub use amd::*;
+pub use crate::amd::*;
 use amd_1::amd_1;
 pub use control::control;
 pub use info::info;
