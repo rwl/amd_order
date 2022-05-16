@@ -168,11 +168,11 @@ the biggest child last in each list:"
     }
 
     let mut k = 0;
+    let mut stack: Vec<isize> = vec![0; nn];
     for i in 0..nn {
         if parent[i] == EMPTY && nv[i] > 0 {
             debug1_print!("Root of assembly tree {}\n", i);
-            // k = post_tree(i, k, &mut child, sibling, &mut order, &mut stack, nn);
-            k = post_tree(i, k, &mut child, &sibling, &mut order, nn);
+            k = post_tree(i, k, &mut child, &sibling, &mut order, &mut stack, nn);
         }
     }
 

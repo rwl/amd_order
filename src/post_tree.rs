@@ -6,9 +6,9 @@ pub fn post_tree(
     child: &mut [isize], // input of size nn, undefined on output
     sibling: &[isize],   // input of size nn, not modified
     order: &mut [isize], // output of size nn
+    stack: &mut [isize],
     nn: usize,
 ) -> usize {
-    let mut stack: Vec<isize> = vec![0; nn];
 
     /*if false {
         // Recursive version (stack[] is not used):
