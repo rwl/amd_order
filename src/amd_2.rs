@@ -379,7 +379,7 @@ pub fn amd_2<I: PrimInt + Display>(
                                     pdst += 1;
                                     let lenj = len[j as usize];
                                     // Copy from source to destination.
-                                    for _knt3 in 0..=lenj - 2 {
+                                    for _knt3 in 0..=(lenj as isize) - 2 {
                                         iw[pdst] = iw[psrc];
                                         pdst += 1;
                                         psrc += 1;
